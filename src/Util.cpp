@@ -227,7 +227,7 @@ Cube_arguments Util::getCubeArguments(int argv,char*argc[]) { //get arguments fo
     return args;
 }
 
-Config_info Util::GetConfiguration(string config_file) {
+Config_info Util::GetConfiguration(string config_file) { //TODO: implement text before numbers and default cases
     std::ifstream config(config_file);
     if(!config.good()){
         cout<< "Invalid Configuation file!"<<endl;

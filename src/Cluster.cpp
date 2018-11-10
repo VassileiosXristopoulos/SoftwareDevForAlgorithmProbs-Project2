@@ -89,4 +89,8 @@ void Cluster::Update() {
 
 }
 
+int Cluster::size() {
+    return this->Members.size();
+}
+
 

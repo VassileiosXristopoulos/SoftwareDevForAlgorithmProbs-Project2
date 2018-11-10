@@ -12,7 +12,7 @@
 class ClusterMaster {
 private:
     bool notFinished = true;
-    DataSetMap Dataset;
+    DataSetMap* Dataset;
     vector<Cluster*> Clusters;
 
 
@@ -20,7 +20,7 @@ private:
     void Assignement();
     void Update();
 public:
-    ClusterMaster(int , DataSetMap);
+    ClusterMaster(int , DataSetMap*);
     ~ClusterMaster();
     void Clustering();
 

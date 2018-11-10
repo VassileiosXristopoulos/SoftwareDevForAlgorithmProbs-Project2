@@ -23,6 +23,7 @@ public:
     void InsertMember(Item*);
     bool ReplaceElements(vector<Item*>);
     void Update();
+    int size();
 };
 
 

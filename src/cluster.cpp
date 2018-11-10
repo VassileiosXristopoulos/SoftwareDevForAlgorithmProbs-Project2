@@ -17,20 +17,20 @@
 
 int k=0;
 int main(int argv, char*argc[]){
-    srand(time(NULL));
 
-    if(argv != 5) {
+
+    if(argv != 9) {
         cout << "Invalid command line arguments" << endl;
         exit(0);
     }
 
-    DataSetMap Map;
-    string input_file = argc[1];
-    string config_file = argc[2];
-    string output_file = argc[3];
-    string metric = argc[4];
+    DataSetMap* Map = new DataSetMap;
+    string input_file = argc[2];
+    string config_file = argc[4];
+    string output_file = argc[6];
+    string metric = argc[8];
 
-    Map.InsertFile(input_file);
+    Map->InsertFile(input_file);
     Config_info info = Util::GetConfiguration(config_file);
     ClusterMaster* Clustermaster = new ClusterMaster(info.k,Map);
     Clustermaster->Clustering();

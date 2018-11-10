@@ -60,9 +60,6 @@ void DataSetMap::InsertFile(string inputFile) {
     file.close();
 
     ifstream input(inputFile);
-    string mode;
-    std::getline(input,mode); //get mode (i.e. first line)
-   // cout<<"mode:"<<mode<<endl;
 
     for( std::string line; getline( input, FileLine ); ) {
 

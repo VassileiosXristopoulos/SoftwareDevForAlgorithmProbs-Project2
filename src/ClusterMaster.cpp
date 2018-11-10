@@ -4,13 +4,16 @@
 
 #include "../header/ClusterMaster.h"
 #include "../header/Util.h"
-
+#include <ctime>
 
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(int k, DataSetMap set) {
-    this->Clusters = vector<Cluster*>(k, new Cluster());
+ClusterMaster::ClusterMaster(int k, DataSetMap* set) {
+    this->Clusters = vector<Cluster*>(k);
+    for(int i=0;i<k;i++){
+        Clusters[i] = new Cluster();
+    }
     this->Dataset = set;
     this->Initialization();
 }
@@ -31,9 +34,12 @@ ClusterMaster::~ClusterMaster() {
  * Random selection (simple)
  */
 void ClusterMaster::Initialization() {
-    for(auto const& cluster_i : Clusters){
+    srand(time(0));
+    for(unsigned int i=0; i<Clusters.size(); i++){
         // select a random Item from Map for each Cluster's centroid
-        cluster_i->SetCentroid(Dataset.at(rand() % Dataset.size() + 1));
+        Item * item = Dataset->at(rand() % Dataset->size());
+        item->SetCluster(i);
+        Clusters[i]->SetCentroid(item);
     }
 }
 
@@ -46,9 +52,9 @@ void ClusterMaster::Initialization() {
 void ClusterMaster::Assignement() {
 
     bool noChanges = true;
-    for(int i=0; i<Dataset.size(); i++){ // for each item
+    for(int i=0; i<Dataset->size(); i++){ // for each item
 
-        Item * dataSetItem = Dataset.at(i);
+        Item * dataSetItem = Dataset->at(i);
 
         /*--------- compute the distance from the closest cluster ------------*/
 
@@ -97,6 +103,7 @@ void ClusterMaster::Clustering() {
         this->Assignement();
         this->Update();
     }
+    cout << "Clustering finished!" << endl;
 }
 
 
