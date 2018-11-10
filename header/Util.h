@@ -7,7 +7,7 @@
 
 
 #include "Item.h"
-struct Lsh_arguments{
+struct Lsh_arguments{ //TODO:  remove structs for project 1
     string inputFile;
     string queryFile;
     int k;
@@ -24,6 +24,13 @@ struct Cube_arguments{
     string outputFIle;
 
 };
+
+struct Config_info{
+    int k;
+    int numof_hashFunctions;
+    int numOf_hashTables;
+};
+
 class Util {
 public:
     static int my_mod(int x, int y);
@@ -43,6 +50,7 @@ public:
 
     static Lsh_arguments getLshArguments(int argv,char *argc[]);
     static Cube_arguments getCubeArguments(int argv,char *argc[]);
+    static Config_info GetConfiguration(string);
 };
 
 #endif //UTIL_H

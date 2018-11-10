@@ -15,14 +15,20 @@ private:
     string name;
     vector<int>content;
     vector<int>g_vector=vector<int>(k);
+    int cluster = -1;
 public:
+    Item(string);
     Item(vector<string>&element);
     ~Item();
     vector<int>& getContent();
+    void SetContent(vector<int>&);
     string getName();
     void setGVector(vector<int>& h_i);
     vector<int>& getGVector();
+    int GetPoint(int);
     int size();
+    void SetCluster(int);
+    int GetCluster();
 };
 
 

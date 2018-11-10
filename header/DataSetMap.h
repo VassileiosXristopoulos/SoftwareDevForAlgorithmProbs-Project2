@@ -16,13 +16,13 @@ class DataSetMap {
 private:
     vector<Item*>Map;
 public:
-    DataSetMap();
+    DataSetMap() = default;
     ~DataSetMap();
     void append(Item *item);
     double TrueDistance(Item*item,string mode);
     int size();
     Item* at(int index);
-    string InsertFile(string file);
+    void InsertFile(string file);
 };
 
 

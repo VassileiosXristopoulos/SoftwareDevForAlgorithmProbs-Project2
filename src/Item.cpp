@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include "../header/Item.h"
 extern int k;
+Item::Item(string name){
+    this->name = name;
+}
 Item::Item(vector<string> &element){
 
     name = element.at(0);
@@ -46,6 +49,23 @@ int Item::size() {
         size+=sizeof(g_vector[i]);
     }
     return size;
+}
+
+void Item::SetContent(vector<int>& content) {
+    this->content = content;
+
+}
+
+int Item::GetPoint(int p) {
+    return content[p];
+}
+
+void Item::SetCluster(int cluster) {
+    this->cluster = cluster;
+}
+
+int Item::GetCluster() {
+    return cluster;
 }
 
 

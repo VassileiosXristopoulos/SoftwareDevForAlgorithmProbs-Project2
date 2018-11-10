@@ -226,3 +226,42 @@ Cube_arguments Util::getCubeArguments(int argv,char*argc[]) { //get arguments fo
     }
     return args;
 }
+
+Config_info Util::GetConfiguration(string config_file) {
+    std::ifstream config(config_file);
+    if(!config.good()){
+        cout<< "Invalid Configuation file!"<<endl;
+        exit(0);
+    }
+    string temp;
+    Config_info info;
+
+    try{
+        getline(config,temp);
+    }
+    catch (ifstream::failure e){
+        cout <<"Cannot read from file" <<endl;
+        exit(0);
+    }
+    info.k = atoi(temp.c_str());
+
+    try{
+        getline(config,temp);
+    }
+    catch (ifstream::failure e){
+        cout <<"Cannot read from file" <<endl;
+        exit(0);
+    }
+    info.numof_hashFunctions = atoi(temp.c_str());
+
+    try{
+        getline(config,temp);
+    }
+    catch (ifstream::failure e){
+        cout <<"Cannot read from file" <<endl;
+        exit(0);
+    }
+    info.numOf_hashTables = atoi(temp.c_str());
+
+    return info;
+}

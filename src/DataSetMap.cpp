@@ -11,7 +11,6 @@
 
 int d,n;
 extern int k;
-DataSetMap::DataSetMap() = default;
 
 DataSetMap::~DataSetMap() {
     for(unsigned int i=0; i<Map.size(); i++){
@@ -50,7 +49,7 @@ Item *DataSetMap::at(int index) {
     return Map[index];
 }
 
-string DataSetMap::InsertFile(string inputFile) {
+void DataSetMap::InsertFile(string inputFile) {
     string FileLine;
     ifstream file(inputFile);
 
@@ -63,7 +62,7 @@ string DataSetMap::InsertFile(string inputFile) {
     ifstream input(inputFile);
     string mode;
     std::getline(input,mode); //get mode (i.e. first line)
-    cout<<"mode:"<<mode<<endl;
+   // cout<<"mode:"<<mode<<endl;
 
     for( std::string line; getline( input, FileLine ); ) {
 
@@ -80,7 +79,7 @@ string DataSetMap::InsertFile(string inputFile) {
         d = static_cast<int>(element.size());
 
     }
-    return mode;
+
 }
 
 
