@@ -79,6 +79,19 @@ void DataSetMap::InsertFile(string inputFile) {
 
 }
 
+DataSetMap::DataSetMap(DataSetMap & Map) {
+    for(int i=0;i<Map.size(); i++){
+        this->Map.push_back(Map.at(i));
+    }
+}
+
+void DataSetMap::erase(Item *item) {
+    int pos = (int)(find(Map.begin(), Map.end(), item) - Map.begin());
+    if(pos<Map.size()){
+        Map.erase(Map.begin()+pos);
+    }
+}
+
 
 
 

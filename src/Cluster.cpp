@@ -5,7 +5,7 @@
 #include "../header/Cluster.h"
 
 Cluster::~Cluster() {
-
+    Centroid = nullptr;
 }
 
 /**

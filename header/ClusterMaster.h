@@ -19,6 +19,7 @@ private:
     void Initialization();
     void Assignement();
     void Update();
+    void kmeanspp();
 public:
     ClusterMaster(int , DataSetMap*);
     ~ClusterMaster();
