@@ -13,6 +13,7 @@ class Cluster {
 private:
     Item * Centroid;
     map<string,Item*>Members;
+    void PAM();
 public:
     Cluster() = default;
     ~Cluster();

@@ -3,6 +3,7 @@
 //
 
 #include "../header/Cluster.h"
+#include "../header/Util.h"
 
 Cluster::~Cluster() {
     Centroid = nullptr;
@@ -67,7 +68,7 @@ bool Cluster::ReplaceElements(vector<Item *>) {
  * K-Means
  */
 void Cluster::Update() {
-    if(Members.empty()) return;
+   /* if(Members.empty()) return;
 
     Item * newCentroid = new Item("");
     int totalElements = static_cast<int>(Members.size());
@@ -85,12 +86,39 @@ void Cluster::Update() {
     }
 
     newCentroid->SetContent(Points);
-    this->Centroid = newCentroid;
+    this->Centroid = newCentroid;*/
+    PAM();
 
 }
 
 int Cluster::size() {
     return this->Members.size();
+}
+
+void Cluster::PAM() {
+    vector<pair<double,string>>distances;
+    for(auto const& i : Members) { // for each element of Cluster
+        Item * element_i = i.second;
+
+        double sum =0; // sum of distances of items from element_i (to be centroid)
+        for(auto const& j : Members){ // get every member of cluster
+            Item * element_j = j.second;
+            if(element_i->getName() != element_j->getName()){ // except itself
+                sum += Util::EucledianDistance(element_i->getContent(),element_j->getContent());
+            }
+        }
+        distances.push_back(make_pair(sum,i.first));
+    }
+
+    double min = distances[0].first;
+    string newCentroid = Members.begin()->first;
+    for(int j=1; j<distances.size(); j++){
+        if(distances[j].first<min){
+            min = distances[j].first;
+            newCentroid = distances[j].second;
+        }
+    }
+    Centroid = Members.find(newCentroid)->second;
 }
 
 
