@@ -234,34 +234,76 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
         exit(0);
     }
     string temp;
+    vector<string> wordVector;
     Config_info info;
 
-    try{
-        getline(config,temp);
+    temp = safe_getline(config); // get the first line
+    wordVector = Split(temp);    // split it to a vector (easier access to words)
+    if(wordVector.size() == 2 && !wordVector[1].empty()){ // if it has 2 words k is the second (space separated)
+        info.k = safe_atoi(wordVector[1]);
     }
-    catch (ifstream::failure e){
-        cout <<"Cannot read from file" <<endl;
+    else if(wordVector.size() == 1){ // if it has 1 word then error (no default k)
+        cout << "Error! Please give k to configuration file "<<endl;
         exit(0);
     }
-    info.k = atoi(temp.c_str());
+    else{
+        cout << "Unknown error when reading configuration file"<<endl;
+        exit(0);
+    }
 
-    try{
-        getline(config,temp);
-    }
-    catch (ifstream::failure e){
-        cout <<"Cannot read from file" <<endl;
-        exit(0);
-    }
-    info.numof_hashFunctions = atoi(temp.c_str());
 
-    try{
-        getline(config,temp);
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size()==2 && !wordVector[1].empty()) {
+        info.numof_hashFunctions = safe_atoi(wordVector[1]);
     }
-    catch (ifstream::failure e){
-        cout <<"Cannot read from file" <<endl;
+    else if(wordVector.size() == 1 || wordVector[1].empty()){ // if 1 word in line, take default num of hashfunctions
+        info.numof_hashFunctions = 4;
+    }
+    else{
+        cout << "Unknown error when reading configuration file"<<endl;
         exit(0);
     }
-    info.numOf_hashTables = atoi(temp.c_str());
+
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.numOf_hashTables = safe_atoi(wordVector[1]);
+    }
+    else if(wordVector.size() == 1 || wordVector[1].empty()) { // if 1 word in line, take default num of hash tables
+        info.numOf_hashTables = 5;
+    }
+    else{
+        cout << "Unknown error when reading configuration file"<<endl;
+        exit(0);
+    }
+
 
     return info;
 }
+
+int Util::safe_atoi(string input) {
+    int ret;
+    try {
+        return stoi(input);
+    }
+    catch(std::exception const & e){
+        cout << "Cannot parse string \"" << input << "\" to integer" << endl;
+        exit(0);
+    }
+
+}
+
+string Util::safe_getline(std::ifstream &config) {
+    string temp;
+    try{
+        getline(config,temp);
+        return  temp;
+    }
+    catch (ifstream::failure e){
+        cout <<"Cannot read file" <<endl;
+        exit(0);
+    }
+}
+
+
