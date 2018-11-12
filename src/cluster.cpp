@@ -29,9 +29,9 @@ int main(int argv, char*argc[]){
     string config_file = argc[4];
     string output_file = argc[6];
     string metric = argc[8];
-
-    Map->InsertFile(input_file);
-    Config_info info = Util::GetConfiguration(config_file);
+                                                            // TODO: implement printing
+    Map->InsertFile(input_file);                            // TODO: implement Shilouette
+    Config_info info = Util::GetConfiguration(config_file); // TODO: implement giving all lsh/cube args from config
     int* Choises = Util::GetUserChoise();
     ClusterMaster* Clustermaster = new ClusterMaster(info.k, Map, Choises);
     Clustermaster->Clustering();
