@@ -32,6 +32,7 @@ int main(int argv, char*argc[]){
 
     Map->InsertFile(input_file);
     Config_info info = Util::GetConfiguration(config_file);
-    ClusterMaster* Clustermaster = new ClusterMaster(info.k,Map);
+    int* Choises = Util::GetUserChoise();
+    ClusterMaster* Clustermaster = new ClusterMaster(info.k, Map, Choises);
     Clustermaster->Clustering();
 }

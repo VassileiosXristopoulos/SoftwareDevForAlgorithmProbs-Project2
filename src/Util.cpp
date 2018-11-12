@@ -306,4 +306,55 @@ string Util::safe_getline(std::ifstream &config) {
     }
 }
 
+int* Util::GetUserChoise() {
+    int* Choises = new int[3];
+    Choises[0] = 0;
+    Choises[1] = 0;
+    Choises[2] = 0;
+    char choise;
+    int a;
+    cout << "Do you wish to set a specific set of algorithms to use? (Y/N)" << endl;
+    cin >> choise;
+    if( choise == 'Y'){
+        cout << "Initialization" << endl;
+        cout << "   1. Random selection of k points" << endl;
+        cout << "   2. K-means++"<<endl;
+        cin >> a;
+        if( a == 1 || a ==2){
+            Choises[0] = a;
+        }
+        else{
+            cout << "Invalid value!" <<endl;
+            exit(0);
+        }
+
+        cout << "Assignment" << endl;
+        cout << "   1. Lloyd's Assignment" << endl;
+        cout << "   2. Assignment by Range search with LSH"<<endl;
+        cout << "   3. Assignment by Range search with Hypercube"<<endl;
+        cin >> a;
+        if( a == 1 || a ==2 ||  a == 3){
+            Choises[1] = a;
+        }
+        else{
+            cout << "Invalid value!" <<endl;
+            exit(0);
+        }
+
+
+        cout << "Update " << endl;
+        cout << "   1. K-means" << endl;
+        cout << "   2. Partitioning Around Medoids"<<endl;
+        cin >> a;
+        if( a == 1 || a ==2 ){
+            Choises[2] = a;
+        }
+        else{
+            cout << "Invalid value!" <<endl;
+            exit(0);
+        }
+    }
+    return Choises;
+}
+
 

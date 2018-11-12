@@ -14,6 +14,7 @@ private:
     Item * Centroid;
     map<string,Item*>Members;
     void PAM();
+    void kmeans();
 public:
     Cluster() = default;
     ~Cluster();
@@ -23,7 +24,7 @@ public:
     void DeleteMember(string);
     void InsertMember(Item*);
     bool ReplaceElements(vector<Item*>);
-    void Update();
+    void Update(int);
     int size();
 };
 

@@ -9,13 +9,22 @@
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(int k, DataSetMap* set) {
+ClusterMaster::ClusterMaster(int k, DataSetMap* set, int* V) {
     this->Clusters = vector<Cluster*>(k);
     for(int i=0;i<k;i++){
         Clusters[i] = new Cluster();
     }
     this->Dataset = set;
-    this->Initialization();
+
+    if(V[0] == 0 && V[1] == 0 && V[2] == 0){ // if no choise is given from user, run all cases
+        Choises = vector<int>(3,1); // 3 positions, value 1 for all (1st choise)
+        canRepeat = true;
+    }
+    else{ // choise is given from user, choose that choise
+        for(int i=0;i<3;i++){
+            Choises.push_back(V[i]);
+        }
+    }
 }
 
 
@@ -30,21 +39,40 @@ ClusterMaster::~ClusterMaster() {
 
 
 /**
+ * Initialization function
+ */
+void ClusterMaster::Initialization() {
+   switch (Choises[0]){
+
+       case 1 :
+           RandomSelection();
+           break;
+
+       case 2:
+           kmeanspp();
+           break;
+
+       default:
+           cout<< "Error: No initialization can be performed" <<endl; // TODO: implement function for errors at Util
+           exit(0);
+
+   }
+}
+
+
+/**
  * Initialize centers
  * Random selection (simple)
  */
-void ClusterMaster::Initialization() {
-   /* srand(time(0));
+void ClusterMaster::RandomSelection() {
+    srand(time(0));
     for(unsigned int i=0; i<Clusters.size(); i++){
         // select a random Item from Map for each Cluster's centroid
         Item * item = Dataset->at(rand() % Dataset->size());
         item->SetCluster(i);
         Clusters[i]->SetCentroid(item);
-    }*/
-   kmeanspp();
+    }
 }
-
-
 
 /**
  * Initialize centers
@@ -122,8 +150,7 @@ void ClusterMaster::kmeanspp() {
  * Assign each point to new Cluster
  * Lloyd's assignement
  */
-void ClusterMaster::Assignement() {
-
+void ClusterMaster::LloydsAssignment() {
     bool noChanges = true;
     for(int i=0; i<Dataset->size(); i++){ // for each item
 
@@ -168,16 +195,47 @@ void ClusterMaster::Assignement() {
 
 
 
+/**
+ * Assignment function
+ */
+void ClusterMaster::Assignement() {
+    switch (Choises[1]){
+        case 1:
+            LloydsAssignment();
+            break;
+        case 2:
+            LloydsAssignment();
+            // LSH
+            break;
+        case 3:
+            LloydsAssignment();
+            //cube
+            break;
+        default:
+            cout<< "Error: No Assignment can be performed" <<endl; // TODO: implement function for errors at Util
+            exit(0);
+    }
+}
+
+
+
 
 /**
  * Perform clustering
  */
 void ClusterMaster::Clustering() {
-    while( notFinished ){
-        this->Assignement();
-        this->Update();
-    }
-    cout << "Clustering finished!" << endl;
+    do{
+        this->Initialization();
+        while( notFinished ){
+            this->Assignement();
+            this->Update();
+        }
+        cout << "Clustering finished!" << endl;
+        SetNextChoise();
+        ResetDataset();
+        notFinished = true;
+    }while(canRepeat);
+
 }
 
 
@@ -187,9 +245,74 @@ void ClusterMaster::Clustering() {
  */
 void ClusterMaster::Update() {
     for(auto const& cluster_i : Clusters){
-        cluster_i->Update();
+        cluster_i->Update(Choises[2]);
     }
 
 }
+
+void ClusterMaster::SetNextChoise() {
+    if(Choises[0]==1 && Choises[1] == 1 && Choises[2] == 1){ // [1,1,1]
+        Choises[2] = 2;
+    }
+    else if(Choises[0]==1 && Choises[1] == 1 && Choises[2] == 2){ // [1,1,2]
+        Choises[1] = 2;
+        Choises[2] = 1;
+    }
+    else if(Choises[0]==1 && Choises[1] == 2 && Choises[2] == 1){ // [1,2,1]
+        Choises[2] = 2;
+    }
+    else if(Choises[0]==1 && Choises[1] == 2 && Choises[2] == 2){ // [1,2,2]
+        Choises[1] = 3;
+        Choises[2] = 1;
+    }
+    else if(Choises[0]==1 && Choises[1] == 3 && Choises[2] == 1){ // [1,3,1]
+        Choises[2] = 2;
+    }
+    else if(Choises[0]==1 && Choises[1] == 3 && Choises[2] == 2){ // [1,3,2]
+        Choises[0] = 2;
+        Choises[1] = 1;
+        Choises[2] = 1;
+    }
+    else if(Choises[0]==2 && Choises[1] == 1 && Choises[2] == 1){ // [2,1,1]
+        Choises[2] = 2;
+    }
+    else if(Choises[0]==2 && Choises[1] == 1 && Choises[2] == 2){ // [2,1,2]
+        Choises[1] = 2;
+        Choises[2] = 1;
+    }
+    else if(Choises[0]==2 && Choises[1] == 2 && Choises[2] == 1){ // [2,2,1]
+        Choises[2] = 2;
+    }
+    else if(Choises[0]==2 && Choises[1] == 2 && Choises[2] == 2){ // [2,2,2]
+        Choises[1] = 3;
+        Choises[2] = 1;
+    }
+    else if(Choises[0]==2 && Choises[1] == 3 && Choises[2] == 1){ // [2,3,1]
+        Choises[2] = 2;
+    }
+    else if(Choises[0]==2 && Choises[1] == 3 && Choises[2] == 2){ // [2,3,2]
+        canRepeat = false; // terminate
+    }
+
+
+}
+
+
+
+/**
+ * For repeating case
+ * Reset all clusters
+ */
+void ClusterMaster::ResetDataset() {
+    for(int i=0;i<Clusters.size();i++){
+        delete (Clusters[i]);
+        Clusters[i] = new Cluster(); //remake all Clusters
+    }
+    for(int i=0 ; i< Dataset->size();i++){
+        Dataset->at(i)->SetCluster(-1); // set -1 to "belongs to cluster" field of each item
+    }
+}
+
+
 
 

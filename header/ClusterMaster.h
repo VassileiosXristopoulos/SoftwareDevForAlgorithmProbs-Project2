@@ -12,18 +12,24 @@
 class ClusterMaster {
 private:
     bool notFinished = true;
+    bool canRepeat = false;
     DataSetMap* Dataset;
     vector<Cluster*> Clusters;
-
+    vector<int>Choises;
 
     void Initialization();
-    void Assignement();
-    void Update();
+    void RandomSelection();
     void kmeanspp();
+    void Assignement();
+    void LloydsAssignment();
+    void Update();
+    void SetNextChoise();
+    void ResetDataset();
 public:
-    ClusterMaster(int , DataSetMap*);
+    ClusterMaster(int , DataSetMap*, int[]);
     ~ClusterMaster();
     void Clustering();
+
 
 
 };

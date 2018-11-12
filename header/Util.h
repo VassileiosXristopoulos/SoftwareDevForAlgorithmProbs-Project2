@@ -53,6 +53,7 @@ public:
     static Config_info GetConfiguration(string);
     static int safe_atoi(string);
     static string safe_getline(std::ifstream&);
+    static int* GetUserChoise();
 };
 
 #endif //UTIL_H

@@ -65,29 +65,20 @@ bool Cluster::ReplaceElements(vector<Item *>) {
 
 /**
  * Update Members
- * K-Means
  */
-void Cluster::Update() {
-   /* if(Members.empty()) return;
-
-    Item * newCentroid = new Item("");
-    int totalElements = static_cast<int>(Members.size());
-    int dimensions = static_cast<int>(Members.begin()->second->getContent().size());
-    vector<int>Points = vector<int>(dimensions,0); // set size to be the same with Item's content, init all with 0
-
-    for(auto const& i : Members){ // for each element of Cluster
-        Item * element_i = i.second;
-        for(unsigned int j=0; j< dimensions ; j++){ // for each point of the element
-            Points[j] += element_i->GetPoint(j);
-        }
-    }
-    for (int l = 0; l < dimensions; ++l) {
-        Points[l] /= totalElements;
+void Cluster::Update(int algorithm) {
+    switch (algorithm){
+        case 1:
+            kmeans();
+            break;
+        case 2:
+            PAM();
+            break;
+        default:
+            cout<< "Error: No Update can be performed" <<endl; // TODO: implement function for errors at Util
+            exit(0);
     }
 
-    newCentroid->SetContent(Points);
-    this->Centroid = newCentroid;*/
-    PAM();
 
 }
 
@@ -119,6 +110,34 @@ void Cluster::PAM() {
         }
     }
     Centroid = Members.find(newCentroid)->second;
+}
+
+
+
+/**
+ * Update Members
+ * K-Means
+ */
+void Cluster::kmeans() {
+    if(Members.empty()) return;
+
+    Item * newCentroid = new Item("");
+    int totalElements = static_cast<int>(Members.size());
+    int dimensions = static_cast<int>(Members.begin()->second->getContent().size());
+    vector<int>Points = vector<int>(dimensions,0); // set size to be the same with Item's content, init all with 0
+
+    for(auto const& i : Members){ // for each element of Cluster
+        Item * element_i = i.second;
+        for(unsigned int j=0; j< dimensions ; j++){ // for each point of the element
+            Points[j] += element_i->GetPoint(j);
+        }
+    }
+    for (int l = 0; l < dimensions; ++l) {
+        Points[l] /= totalElements;
+    }
+
+    newCentroid->SetContent(Points);
+    this->Centroid = newCentroid;
 }
 
 
