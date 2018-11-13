@@ -8,13 +8,15 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include "Util.h"
+
 using namespace std;
-extern int k;
+
 class Item {
 private:
     string name;
     vector<int>content;
-    vector<int>g_vector=vector<int>(k);
+    vector<int>g_vector=vector<int>(rangeSearch_consts::k);
     int cluster = -1;
 public:
     Item(string);

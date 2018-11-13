@@ -140,4 +140,8 @@ void Cluster::kmeans() {
     this->Centroid = newCentroid;
 }
 
+void Cluster::FlushClusterMembers() {
+    this->Members.clear();
+}
+
 

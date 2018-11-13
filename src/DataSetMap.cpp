@@ -8,9 +8,10 @@
 #include <algorithm>
 #include "../header/DataSetMap.h"
 #include "../header/Util.h"
+#include "../header/lsh/lsh.h"
 
 int d,n;
-extern int k;
+
 
 DataSetMap::~DataSetMap() {
     for(unsigned int i=0; i<Map.size(); i++){
@@ -56,7 +57,7 @@ void DataSetMap::InsertFile(string inputFile) {
     //count lines of file -- if k = default then k = log2(n) -- for hypercube
     n = (int)std::count(std::istreambuf_iterator<char>(file),
                std::istreambuf_iterator<char>(), '\n') - 1;
-    if(k==-1) k = (int)log2(n);
+    if(rangeSearch_consts::k==-1) rangeSearch_consts::k = (int)log2(n);
     file.close();
 
     ifstream input(inputFile);

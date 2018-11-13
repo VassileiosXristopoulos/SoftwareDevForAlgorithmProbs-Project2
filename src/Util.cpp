@@ -278,6 +278,41 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
         exit(0);
     }
 
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.lsh_k = safe_atoi(wordVector[1]);
+    }
+
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.lsh_L = safe_atoi(wordVector[1]);
+    }
+
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.lsh_w = safe_atoi(wordVector[1]);
+    }
+
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.cube_k = safe_atoi(wordVector[1]);
+    }
+
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.cube_M = safe_atoi(wordVector[1]);
+    }
+
+    temp = safe_getline(config);
+    wordVector = Split(temp);
+    if(wordVector.size() == 2 && !wordVector[1].empty()) {
+        info.cube_probes = safe_atoi(wordVector[1]);
+    }
 
     return info;
 }

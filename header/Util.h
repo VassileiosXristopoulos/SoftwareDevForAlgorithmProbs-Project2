@@ -29,7 +29,21 @@ struct Config_info{
     int k;
     int numof_hashFunctions;
     int numOf_hashTables;
+    int lsh_k;
+    int lsh_L;
+    int lsh_w;
+    int cube_k;
+    int cube_M;
+    int cube_probes;
 };
+
+namespace rangeSearch_consts{
+    int L;
+    int k;
+    int w;
+    int d;
+}
+
 
 class Util {
 public:

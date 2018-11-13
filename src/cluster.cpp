@@ -33,6 +33,6 @@ int main(int argv, char*argc[]){
     Map->InsertFile(input_file);                            // TODO: implement Shilouette
     Config_info info = Util::GetConfiguration(config_file); // TODO: implement giving all lsh/cube args from config
     int* Choises = Util::GetUserChoise();
-    ClusterMaster* Clustermaster = new ClusterMaster(info.k, Map, Choises);
+    ClusterMaster* Clustermaster = new ClusterMaster(info, Map, Choises,metric);
     Clustermaster->Clustering();
 }

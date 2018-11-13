@@ -9,6 +9,11 @@
 
 #include "DataSetMap.h"
 #include "Cluster.h"
+#include "lsh/AHashTable.h"
+#include "hypercube/AHypercube.h"
+#include "Util.h"
+#include "lsh/lsh.h"
+
 class ClusterMaster {
 private:
     bool notFinished = true;
@@ -16,17 +21,20 @@ private:
     DataSetMap* Dataset;
     vector<Cluster*> Clusters;
     vector<int>Choises;
+    lsh * lsh_master;
+    AHypercube * Hypercube;
 
     void Initialization();
     void RandomSelection();
     void kmeanspp();
     void Assignement();
     void LloydsAssignment();
+    void LSHAssignment();
     void Update();
     void SetNextChoise();
     void ResetDataset();
 public:
-    ClusterMaster(int , DataSetMap*, int[]);
+    ClusterMaster(Config_info, DataSetMap*, int[],string);
     ~ClusterMaster();
     void Clustering();
 

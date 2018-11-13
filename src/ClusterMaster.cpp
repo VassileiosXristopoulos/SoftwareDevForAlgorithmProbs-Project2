@@ -9,12 +9,12 @@
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(int k, DataSetMap* set, int* V) {
-    this->Clusters = vector<Cluster*>(k);
-    for(int i=0;i<k;i++){
+ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string metric) {
+    this->Clusters = vector<Cluster*>((unsigned long)config_info.k);
+    for(int i=0;i<config_info.k;i++){
         Clusters[i] = new Cluster();
     }
-    this->Dataset = set;
+
 
     if(V[0] == 0 && V[1] == 0 && V[2] == 0){ // if no choise is given from user, run all cases
         Choises = vector<int>(3,1); // 3 positions, value 1 for all (1st choise)
@@ -24,6 +24,19 @@ ClusterMaster::ClusterMaster(int k, DataSetMap* set, int* V) {
         for(int i=0;i<3;i++){
             Choises.push_back(V[i]);
         }
+    }
+    switch (Choises[1]){
+        case 1:
+            this->Dataset = set; // Keep a simple array with the dataset
+            break;
+        case 2:
+            lsh_master = new lsh(config_info.lsh_k,config_info.L,config_info.w,metric,set);
+            break;
+        case 3:
+            // cube
+            break;
+        default:
+            break;
     }
 }
 
@@ -71,6 +84,7 @@ void ClusterMaster::RandomSelection() {
         Item * item = Dataset->at(rand() % Dataset->size());
         item->SetCluster(i);
         Clusters[i]->SetCentroid(item);
+        item->SetCluster(i);
     }
 }
 
@@ -81,6 +95,7 @@ void ClusterMaster::RandomSelection() {
 void ClusterMaster::kmeanspp() {
     int initialCentroid = rand() % Dataset->size();
     Clusters[0]->SetCentroid(Dataset->at(initialCentroid)); // pick uniformly first centroid
+    Dataset->at(initialCentroid)->SetCluster(0);
     DataSetMap* nonCentroidMap = new DataSetMap(*Dataset); // get copy of Dataset, keep only the non centroids
     nonCentroidMap->erase(Dataset->at(initialCentroid)); //erase from map, keep only the non centroids
 
@@ -137,7 +152,7 @@ void ClusterMaster::kmeanspp() {
         }
 
         Clusters[i]->SetCentroid(nonCentroidMap->at(newCentroid));
-
+        nonCentroidMap->at(newCentroid)->SetCluster(i);
         // now keep only the non centroid in Di and nonCentroidMap - that way the indexing will be consistent
         nonCentroidMap->erase(nonCentroidMap->at(newCentroid));
         Di.erase(Di.begin()+newCentroid);
@@ -204,7 +219,7 @@ void ClusterMaster::Assignement() {
             LloydsAssignment();
             break;
         case 2:
-            LloydsAssignment();
+            LSHAssignment();
             // LSH
             break;
         case 3:
@@ -311,6 +326,72 @@ void ClusterMaster::ResetDataset() {
     for(int i=0 ; i< Dataset->size();i++){
         Dataset->at(i)->SetCluster(-1); // set -1 to "belongs to cluster" field of each item
     }
+}
+
+void ClusterMaster::LSHAssignment() {
+    bool itemsAssigned;
+    int items_returned;
+
+    for(int i=0;i<Clusters.size();i++){ // clear all Clusters (except the centroid obviously)
+        Clusters[i]->FlushClusterMembers(); //in this algorithm we compute all members from 0
+    }
+    /*----------------------ATTENTION: Until Loops are finished no item is inserted to cluster.  --------------------*/
+    /*----------------------Reason is we would have to insert and delete from list.  --------------------*/
+    /*----------------------Only when the algorithm decides the partitioning, we assign to lists  --------------------*/
+    do{
+        itemsAssigned = false;
+        items_returned = 0;
+        double r = 0.1;
+
+        for(int i=0;i<Clusters.size();i++){ // for each cluster
+            vector<Item*>Ncloser = lsh_master->FindItemsInRange(Clusters[i]->GetCentroid(),r); // get items in range
+            items_returned += Ncloser.size();
+            for( int j=0;j<Ncloser.size(); j++){ // for each item in range
+                if( Ncloser[i]->GetCluster() == -1){  // if items doesn't belong to some cluster
+                    itemsAssigned = true;
+                    Ncloser[i]->SetCluster(i);
+                }
+                else{
+                    // compute distance from it's current cluster's centroid
+                    double distFromOwner = Util::EucledianDistance(Ncloser[i]->getContent(),
+                            Clusters[Ncloser[i]->GetCluster()]->GetCentroid()->getContent());
+                    // compute distance from the cluster which got it in range as well
+                    double distFromcurr = Util::EucledianDistance(Ncloser[i]->getContent(),
+                            Clusters[i]->GetCentroid()->getContent());
+                    if(distFromOwner>distFromcurr){ // if found closer cluster, assign to it
+                        Ncloser[i]->SetCluster(i);
+                        itemsAssigned = true;
+                    }
+                }
+            }
+        }
+
+        r *= 2;
+    }while(itemsAssigned && items_returned > 0); // loop until no more items returned from search or no item changed
+
+    for(int i=0;i<Dataset->size();i++){
+        if(Dataset->at(i)->GetCluster()==-1){ // if there is any item with no cluster
+            int min_cluster = 0; // number indicating which cluster is the closest
+            // minimum distance from cluster
+            double min_dist = Util::EucledianDistance(Dataset->at(i)->getContent(),Clusters[0]->GetCentroid()
+            ->getContent());
+            for(int j=1;j<Clusters.size();j++){ // find the closest cluster
+                double dist = Util::EucledianDistance(Dataset->at(i)->getContent(),Clusters[j]->GetCentroid()
+                        ->getContent());
+                if(dist<min_dist){
+                    min_dist = dist;
+                    min_cluster = j;
+                }
+            }
+            Clusters[min_cluster]->InsertMember(Dataset->at(i));
+            Dataset->at(i)->SetCluster(min_cluster); // assign to it's closest cluster
+        }
+        else{ // finally assign to the clusters that the range search decided
+            Clusters[Dataset->at(i)->GetCluster()]->InsertMember(Dataset->at(i));
+        }
+
+    }
+    //lsh_master->FindItemsInRange();
 }
 
 
