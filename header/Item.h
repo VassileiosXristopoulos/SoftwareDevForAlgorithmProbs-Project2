@@ -2,13 +2,14 @@
 // Created by vassilis on 13/10/2018.
 //
 
-#ifndef TEST_ITEM_H
-#define TEST_ITEM_H
+#ifndef ITEM_H
+#define ITEM_H
 #include <iostream>
 #include <cstdio>
 #include <string>
 #include <vector>
-#include "Util.h"
+
+#include "rangeSearch_consts.h"
 
 using namespace std;
 

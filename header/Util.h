@@ -37,12 +37,6 @@ struct Config_info{
     int cube_probes;
 };
 
-namespace rangeSearch_consts{
-    int L;
-    int k;
-    int w;
-    int d;
-}
 
 
 class Util {

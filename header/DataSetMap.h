@@ -2,8 +2,8 @@
 // Created by vassilis on 13/10/2018.
 //
 
-#ifndef TEST_DATASETMAP_H
-#define TEST_DATASETMAP_H
+#ifndef DATASETMAP_H
+#define DATASETMAP_H
 
 #include <iostream>
 #include <cstdio>

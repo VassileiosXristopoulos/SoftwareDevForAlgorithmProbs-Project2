@@ -4,6 +4,8 @@
 
 #include <cstdlib>
 #include "../header/Item.h"
+#include "../header/Util.h"
+
 Item::Item(string name){
     this->name = name;
 }

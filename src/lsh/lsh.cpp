@@ -7,6 +7,7 @@
 #include "../../header/lsh/EucledianHashTable.h"
 #include "../../header/lsh/CosineHashTable.h"
 #include "../../header/Util.h"
+#include "../../header/rangeSearch_consts.h"
 
 lsh::lsh(int k, int L, int w, string metric,DataSetMap *set) {
     for (int i = 0; i < L; i++) { //construct the L HashTables

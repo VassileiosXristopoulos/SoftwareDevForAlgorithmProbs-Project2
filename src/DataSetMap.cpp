@@ -9,6 +9,7 @@
 #include "../header/DataSetMap.h"
 #include "../header/Util.h"
 #include "../header/lsh/lsh.h"
+#include "../header/rangeSearch_consts.h"
 
 int d,n;
 

@@ -20,6 +20,7 @@ set(cluster
         "src/hypercube/BinaryMap.cpp"
         "src/hypercube/AHypercube.cpp"
         "src/hypercube/EucledianHypercube.cpp"
-        "src/lsh/lsh.cpp")
+        "src/lsh/lsh.cpp"
+        "src/rangeSearch_consts.cpp")
 
 add_executable(cluster ${cluster})

@@ -5,6 +5,10 @@
 #include "../header/ClusterMaster.h"
 #include "../header/Util.h"
 #include <ctime>
+#include <random>
+
+default_random_engine generator;
+normal_distribution<float> distribution(0,1);
 
 /**
  * Constructor
@@ -30,7 +34,7 @@ ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,st
             this->Dataset = set; // Keep a simple array with the dataset
             break;
         case 2:
-            lsh_master = new lsh(config_info.lsh_k,config_info.L,config_info.w,metric,set);
+            lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.lsh_w,metric,set);
             break;
         case 3:
             // cube
@@ -391,7 +395,6 @@ void ClusterMaster::LSHAssignment() {
         }
 
     }
-    //lsh_master->FindItemsInRange();
 }
 
 
