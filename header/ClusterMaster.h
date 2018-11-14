@@ -18,6 +18,7 @@ class ClusterMaster {
 private:
     bool notFinished = true;
     bool canRepeat = false;
+    bool complete;
     DataSetMap* Dataset;
     vector<Cluster*> Clusters;
     vector<int>Choises;
@@ -33,8 +34,9 @@ private:
     void Update();
     void SetNextChoise();
     void ResetDataset();
+    void PrintResults();
 public:
-    ClusterMaster(Config_info, DataSetMap*, int[],string&);
+    ClusterMaster(Config_info, DataSetMap*, int[],string&,bool);
     ~ClusterMaster();
     void Clustering();
 

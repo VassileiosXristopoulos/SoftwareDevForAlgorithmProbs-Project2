@@ -13,8 +13,8 @@ class Cluster {
 private:
     Item * Centroid;
     map<string,Item*>Members;
-    void PAM();
-    void kmeans();
+    bool PAM();
+    bool kmeans();
 public:
     Cluster() = default;
     ~Cluster();
@@ -24,7 +24,8 @@ public:
     void DeleteMember(string);
     void InsertMember(Item*);
     bool ReplaceElements(vector<Item*>);
-    void Update(int);
+    vector<string> GetMembers();
+    bool Update(int);
     void FlushClusterMembers();
     int size();
 };

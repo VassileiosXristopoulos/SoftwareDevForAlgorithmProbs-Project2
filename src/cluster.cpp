@@ -19,7 +19,7 @@ int k=0;
 int main(int argv, char*argc[]){
 
 
-    if(argv != 9) {
+    if(argv != 9 && argv!= 10) {
         cout << "Invalid command line arguments" << endl;
         exit(0);
     }
@@ -29,10 +29,15 @@ int main(int argv, char*argc[]){
     string config_file = argc[4];
     string output_file = argc[6];
     string metric = argc[8];
+    bool complete = false;
+    if(argv==10){
+        if(*(new string(argc[9])) == "-complete")
+            complete=true;
+    }
                                                             // TODO: implement printing
     Map->InsertFile(input_file);                            // TODO: implement Shilouette
     Config_info info = Util::GetConfiguration(config_file); // TODO: implement giving all lsh/cube args from config
     int* Choises = Util::GetUserChoise();
-    ClusterMaster* Clustermaster = new ClusterMaster(info, Map, Choises,metric);
+    ClusterMaster* Clustermaster = new ClusterMaster(info, Map, Choises,metric,complete);
     Clustermaster->Clustering();
 }

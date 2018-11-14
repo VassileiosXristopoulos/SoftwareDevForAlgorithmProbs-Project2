@@ -15,7 +15,10 @@ normal_distribution<float> distribution(0,1);
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric) {
+ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric,bool complete) {
+
+    this->complete = complete; // for complete printing
+
     this->Clusters = vector<Cluster*>((unsigned long)config_info.k);
     for(int i=0;i<config_info.k;i++){
         Clusters[i] = new Cluster();
@@ -205,11 +208,9 @@ void ClusterMaster::LloydsAssignment() {
             }
             dataSetItem->SetCluster(closerCluster); // set the item's cluster to be the new cluster
             Clusters[closerCluster]->InsertMember(dataSetItem); //insert the item to it's new cluster
-            noChanges = false; // save that changes were made (for ending condition)
         }
 
     }
-    notFinished = !noChanges; // if changes where made, then not finished
 }
 
 
@@ -250,7 +251,7 @@ void ClusterMaster::Clustering() {
             this->Assignement();
             this->Update();
         }
-        cout << "Clustering finished!" << endl;
+        PrintResults();
         SetNextChoise();
         ResetDataset();
         notFinished = true;
@@ -264,10 +265,11 @@ void ClusterMaster::Clustering() {
  * Update centers of each Cluster
  */
 void ClusterMaster::Update() {
+    bool noChanges = true;
     for(auto const& cluster_i : Clusters){
-        cluster_i->Update(Choises[2]);
+        noChanges &= cluster_i->Update(Choises[2]);
     }
-
+    notFinished = !noChanges;
 }
 
 void ClusterMaster::SetNextChoise() {
@@ -334,15 +336,21 @@ void ClusterMaster::ResetDataset() {
 }
 
 void ClusterMaster::LSHAssignment() {
-    bool itemsAssigned;
-    int items_returned;
-    bool noChanges = true;
 
+    int items_returned;
+    // copy of dataset for only non assigned items
+    // when an item is assigned somewhere, we delete it from this set
+    // reason is we need a fast way to see if there are any unassigned items in order to stop looping
+    DataSetMap * nonAssignedItems = this->Dataset;
+
+    for(int i=0;i<Clusters.size();i++){ // clear all Clusters (except the centroid obviously)
+        Clusters[i]->FlushClusterMembers(); //in this algorithm we compute all members from 0
+    }
     /*----------------------ATTENTION: Until Loops are finished no item is inserted to cluster.  --------------------*/
     /*----------------------Reason is we would have to insert and delete from list.  --------------------*/
     /*----------------------Only when the algorithm decides the partitioning, we assign to lists  --------------------*/
     do{
-        itemsAssigned = false;
+
         items_returned = 0;
         double r = 0.1;
 
@@ -351,8 +359,8 @@ void ClusterMaster::LSHAssignment() {
             items_returned += Ncloser.size();
             for( int j=0;j<Ncloser.size(); j++){ // for each item in range
                 if( Ncloser[i]->GetCluster() == -1){  // if items doesn't belong to some cluster
-                    itemsAssigned = true;
                     Ncloser[i]->SetCluster(i);
+                    nonAssignedItems->erase(Ncloser[i]); // keep only the non assigned items
                 }
                 else{
                     // compute distance from it's current cluster's centroid
@@ -363,16 +371,14 @@ void ClusterMaster::LSHAssignment() {
                             Clusters[i]->GetCentroid()->getContent());
                     if(distFromOwner>distFromcurr){ // if found closer cluster, assign to it
                         Ncloser[i]->SetCluster(i);
-                        itemsAssigned = true;
                     }
                 }
             }
         }
-        if(itemsAssigned) // if some item changed cluster, then changes made
-            noChanges = false;
 
         r *= 2;
-    }while(itemsAssigned && items_returned > 0); // loop until no more items returned from search or no item changed
+    }while(nonAssignedItems->size()>0 && items_returned > 0); // loop until no more items unassigned from search or no
+    // item changed
 
     for(int i=0;i<Dataset->size();i++){
         if(Dataset->at(i)->GetCluster()==-1){ // if there is any item with no cluster
@@ -396,7 +402,36 @@ void ClusterMaster::LSHAssignment() {
         }
 
     }
-    notFinished = !noChanges; // if changes where made, then not finished
+
+}
+
+void ClusterMaster::PrintResults() {
+    cout <<"Algorithm " << Choises[0] <<"."<<Choises[1]<<"."<<Choises[2]<<endl<<endl;
+    for(int i=0; i<Clusters.size();i++){
+        cout <<"CLUSTER-"<<i+1<<" { size:"<<Clusters[i]->size() <<" Centroid: ";
+        if(Choises[2] == 1){ //kmeans-update
+            cout << "[ ";
+            for(int j=0;j<Clusters[i]->GetCentroid()->getContent().size();j++){
+                cout<<Clusters[i]->GetCentroid()->getContent()[j]<<" ";
+            }
+            cout<<"] }"<<endl;
+        }
+        else if(Choises[2] == 2){ //k-medoids update
+           cout <<Clusters[i]->GetCentroid()->getName() <<" }"<<endl;
+        }
+    }
+    cout<<endl;
+    if(complete){ //complete printing
+        cout << "/*------------------- Items in each cluster -----------------*/"<<endl;
+        for(int i=0; i<Clusters.size();i++) {
+            cout << "CLUSTER-" << i + 1 <<" { ";
+            for(int j=0;j<Clusters[i]->GetMembers().size();j++){
+                cout << Clusters[i]->GetMembers()[j]<<" ";
+            }
+            cout<<" }"<<endl;
+        }
+    }
+    cout<<endl<<endl<<endl;
 }
 
 

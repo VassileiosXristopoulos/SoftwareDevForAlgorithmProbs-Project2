@@ -66,19 +66,20 @@ bool Cluster::ReplaceElements(vector<Item *>) {
 /**
  * Update Members
  */
-void Cluster::Update(int algorithm) {
+bool Cluster::Update(int algorithm) {
+    bool ret;
     switch (algorithm){
         case 1:
-            kmeans();
+            ret = kmeans();
             break;
         case 2:
-            PAM();
+            ret = PAM();
             break;
         default:
             cout<< "Error: No Update can be performed" <<endl; // TODO: implement function for errors at Util
             exit(0);
     }
-
+    return ret;
 
 }
 
@@ -86,7 +87,8 @@ int Cluster::size() {
     return this->Members.size();
 }
 
-void Cluster::PAM() {
+bool Cluster::PAM() {
+    if(Members.empty()) return true;
     vector<pair<double,string>>distances;
     for(auto const& i : Members) { // for each element of Cluster
         Item * element_i = i.second;
@@ -109,7 +111,13 @@ void Cluster::PAM() {
             newCentroid = distances[j].second;
         }
     }
-    Centroid = Members.find(newCentroid)->second;
+    Item * NewCentroid = Members.find(newCentroid)->second;
+
+    if(NewCentroid->getName() == Centroid->getName()){ // if the centroid did not change
+        return true;
+    }
+    Centroid = NewCentroid;
+    return false;
 }
 
 
@@ -118,8 +126,8 @@ void Cluster::PAM() {
  * Update Members
  * K-Means
  */
-void Cluster::kmeans() {
-    if(Members.empty()) return;
+bool Cluster::kmeans() {
+    if(Members.empty()) return true;
 
     Item * newCentroid = new Item("");
     int totalElements = static_cast<int>(Members.size());
@@ -137,11 +145,29 @@ void Cluster::kmeans() {
     }
 
     newCentroid->SetContent(Points);
+
+    if (std::equal(Centroid->getContent().begin(), Centroid->getContent().begin() + Centroid->getContent().size(),
+            newCentroid->getContent()
+    .begin())){ // if the centroid remains the same (condition checks if 2 contents are equal)
+        return true;
+    }
+
     this->Centroid = newCentroid;
+    return false;
 }
 
 void Cluster::FlushClusterMembers() {
+    for(auto const & i : Members)
+        i.second->SetCluster(-1); // item belongs to no cluster
     this->Members.clear();
+}
+
+vector<string> Cluster::GetMembers() {
+    vector<string> members;
+    for(auto const& i : Members){
+        members.push_back(i.first);
+    }
+    return members;
 }
 
 
