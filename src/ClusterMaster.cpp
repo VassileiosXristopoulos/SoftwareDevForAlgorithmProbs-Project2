@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by vassilis on 10/11/2018.
 //
@@ -13,7 +15,7 @@ normal_distribution<float> distribution(0,1);
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string metric) {
+ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric) {
     this->Clusters = vector<Cluster*>((unsigned long)config_info.k);
     for(int i=0;i<config_info.k;i++){
         Clusters[i] = new Cluster();
@@ -29,12 +31,11 @@ ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,st
             Choises.push_back(V[i]);
         }
     }
+    // we nead this dataset at every case because of initialization step
+    this->Dataset = set; // Keep a simple array with the dataset
     switch (Choises[1]){
-        case 1:
-            this->Dataset = set; // Keep a simple array with the dataset
-            break;
         case 2:
-            lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.lsh_w,metric,set);
+            lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.lsh_w, metric,set);
             break;
         case 3:
             // cube
@@ -335,10 +336,8 @@ void ClusterMaster::ResetDataset() {
 void ClusterMaster::LSHAssignment() {
     bool itemsAssigned;
     int items_returned;
+    bool noChanges = true;
 
-    for(int i=0;i<Clusters.size();i++){ // clear all Clusters (except the centroid obviously)
-        Clusters[i]->FlushClusterMembers(); //in this algorithm we compute all members from 0
-    }
     /*----------------------ATTENTION: Until Loops are finished no item is inserted to cluster.  --------------------*/
     /*----------------------Reason is we would have to insert and delete from list.  --------------------*/
     /*----------------------Only when the algorithm decides the partitioning, we assign to lists  --------------------*/
@@ -369,6 +368,8 @@ void ClusterMaster::LSHAssignment() {
                 }
             }
         }
+        if(itemsAssigned) // if some item changed cluster, then changes made
+            noChanges = false;
 
         r *= 2;
     }while(itemsAssigned && items_returned > 0); // loop until no more items returned from search or no item changed
@@ -395,6 +396,7 @@ void ClusterMaster::LSHAssignment() {
         }
 
     }
+    notFinished = !noChanges; // if changes where made, then not finished
 }
 
 

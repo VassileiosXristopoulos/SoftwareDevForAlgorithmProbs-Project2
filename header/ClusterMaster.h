@@ -34,7 +34,7 @@ private:
     void SetNextChoise();
     void ResetDataset();
 public:
-    ClusterMaster(Config_info, DataSetMap*, int[],string);
+    ClusterMaster(Config_info, DataSetMap*, int[],string&);
     ~ClusterMaster();
     void Clustering();
 

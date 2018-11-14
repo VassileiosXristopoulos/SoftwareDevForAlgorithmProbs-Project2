@@ -9,7 +9,13 @@
 #include "../../header/Util.h"
 #include "../../header/rangeSearch_consts.h"
 
-lsh::lsh(int k, int L, int w, string metric,DataSetMap *set) {
+lsh::lsh(int k, int L, int w, string& metric,DataSetMap *set) {
+
+    rangeSearch_consts::L = L;
+    rangeSearch_consts::k = k;
+    rangeSearch_consts::w = w;
+    rangeSearch_consts::d = (int)set->at(0)->getContent().size();
+
     for (int i = 0; i < L; i++) { //construct the L HashTables
         if (metric == "eucledian") {
             this->LshHashTables.push_back(new EucledianHashTable(k, set->size() / 8));
@@ -21,10 +27,7 @@ lsh::lsh(int k, int L, int w, string metric,DataSetMap *set) {
             LshHashTables[i]->add(set->at(j));
         }
     }
-    rangeSearch_consts::L = L;
-    rangeSearch_consts::k = k;
-    rangeSearch_consts::w = w;
-    rangeSearch_consts::d = (int)set->at(0)->getContent().size();
+
 }
 
 vector<Item*> lsh::FindItemsInRange(Item * centroid, double r) {

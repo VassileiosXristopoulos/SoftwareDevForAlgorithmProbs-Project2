@@ -16,7 +16,7 @@ private:
     vector<AHashTable*> LshHashTables;
 
 public:
-    lsh(int k,int L,int w,string metric,DataSetMap *set);
+    lsh(int k,int L,int w,string& metric,DataSetMap *set);
     vector<Item*> FindItemsInRange(Item * item, double r);
 };
 
