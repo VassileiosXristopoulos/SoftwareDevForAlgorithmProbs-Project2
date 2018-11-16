@@ -31,13 +31,17 @@ lsh::lsh(int k, int L, int w, string& metric,DataSetMap *set) {
 }
 
 vector<Item*> lsh::FindItemsInRange(Item * centroid, double r) {
-    vector<Item*> closerNneighboors;
+    vector<Item*> closerNneighboors=vector<Item*>();
+    if(rangeSearch_consts::L == -1){
+        cout <<"Cannot perform LSH" <<endl;
+        exit(0);
+    }
     for (int i = 0; i < rangeSearch_consts::L; i++) { //for each hashtable
         vector<Item*> Nneighboors = this->LshHashTables[i]->findNcloserNeighbors(centroid,r);
 
-        for(unsigned int j=0; j<Nneighboors.size(); i++){
-            if(Nneighboors[i]->GetCluster() != centroid->GetCluster()){ // return only those NOT already in the cluster
-                closerNneighboors.push_back(Nneighboors[i]);
+        for(unsigned int j=0; j<Nneighboors.size(); j++){
+            if(Nneighboors[j]->GetCluster() != centroid->GetCluster()){ // return only those NOT already in the cluster
+                closerNneighboors.push_back(Nneighboors[j]);
             }
 
         }
@@ -49,6 +53,12 @@ vector<Item*> lsh::FindItemsInRange(Item * centroid, double r) {
                 .end());
     }
     return closerNneighboors;
+}
+
+lsh::~lsh() {
+    for (int i = 0; i < rangeSearch_consts::L; i++) {
+        delete (LshHashTables[i]);
+    }
 }
 
 

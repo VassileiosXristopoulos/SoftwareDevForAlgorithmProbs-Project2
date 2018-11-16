@@ -18,6 +18,8 @@ normal_distribution<float> distribution(0,1);
 ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric,bool complete) {
 
     this->complete = complete; // for complete printing
+    this->config_info = config_info;
+    this->metric = metric;
 
     this->Clusters = vector<Cluster*>((unsigned long)config_info.k);
     for(int i=0;i<config_info.k;i++){
@@ -278,6 +280,7 @@ void ClusterMaster::SetNextChoise() {
         Choises[2] = 2;
     }
     else if(Choises[0]==1 && Choises[1] == 1 && Choises[2] == 2){ // [1,1,2]
+        lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.w, metric ,this->Dataset);
         Choises[1] = 2;
         Choises[2] = 1;
     }
@@ -285,13 +288,21 @@ void ClusterMaster::SetNextChoise() {
         Choises[2] = 2;
     }
     else if(Choises[0]==1 && Choises[1] == 2 && Choises[2] == 2){ // [1,2,2]
+        if(lsh_master != nullptr){
+            delete(lsh_master);
+        }
         Choises[1] = 3;
         Choises[2] = 1;
+        hypercube_master = new cube(config_info.cube_k,config_info.w,config_info.cube_probes,config_info.cube_M,metric,
+                                    this->Dataset);
     }
     else if(Choises[0]==1 && Choises[1] == 3 && Choises[2] == 1){ // [1,3,1]
         Choises[2] = 2;
     }
     else if(Choises[0]==1 && Choises[1] == 3 && Choises[2] == 2){ // [1,3,2]
+        if(hypercube_master != nullptr){
+            delete(hypercube_master);
+        }
         Choises[0] = 2;
         Choises[1] = 1;
         Choises[2] = 1;
@@ -300,6 +311,7 @@ void ClusterMaster::SetNextChoise() {
         Choises[2] = 2;
     }
     else if(Choises[0]==2 && Choises[1] == 1 && Choises[2] == 2){ // [2,1,2]
+        lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.w, metric ,this->Dataset);
         Choises[1] = 2;
         Choises[2] = 1;
     }
@@ -307,14 +319,22 @@ void ClusterMaster::SetNextChoise() {
         Choises[2] = 2;
     }
     else if(Choises[0]==2 && Choises[1] == 2 && Choises[2] == 2){ // [2,2,2]
+        if(lsh_master != nullptr){
+            delete(lsh_master);
+        }
         Choises[1] = 3;
         Choises[2] = 1;
+        hypercube_master = new cube(config_info.cube_k,config_info.w,config_info.cube_probes,config_info.cube_M,metric,
+                                    this->Dataset);
     }
     else if(Choises[0]==2 && Choises[1] == 3 && Choises[2] == 1){ // [2,3,1]
         Choises[2] = 2;
     }
     else if(Choises[0]==2 && Choises[1] == 3 && Choises[2] == 2){ // [2,3,2]
         canRepeat = false; // terminate
+        if(hypercube_master != nullptr){
+            delete(hypercube_master);
+        }
     }
 
 
@@ -342,10 +362,14 @@ void ClusterMaster::RangeSearchAssignment(string& method) {
     // copy of dataset for only non assigned items
     // when an item is assigned somewhere, we delete it from this set
     // reason is we need a fast way to see if there are any unassigned items in order to stop looping
-    DataSetMap * nonAssignedItems = this->Dataset;
+    DataSetMap * nonAssignedItems = new DataSetMap();
+    for(int i=0;i<Dataset->size(); i++){
+        nonAssignedItems->append(Dataset->at(i));
+    }
 
     for(int i=0;i<Clusters.size();i++){ // clear all Clusters (except the centroid obviously)
         Clusters[i]->FlushClusterMembers(); //in this algorithm we compute all members from 0
+        nonAssignedItems->erase(Clusters[i]->GetCentroid());
     }
     /*----------------------ATTENTION: Until Loops are finished no item is inserted to cluster.  --------------------*/
     /*----------------------Reason is we would have to insert and delete from list.  --------------------*/

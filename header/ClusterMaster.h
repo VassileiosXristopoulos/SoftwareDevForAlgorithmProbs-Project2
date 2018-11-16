@@ -25,6 +25,8 @@ private:
     vector<int>Choises;
     lsh * lsh_master;
     cube* hypercube_master;
+    Config_info config_info;
+    string metric;
 
     void Initialization();
     void RandomSelection();

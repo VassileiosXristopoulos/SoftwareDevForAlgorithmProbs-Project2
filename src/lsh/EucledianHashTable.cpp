@@ -46,9 +46,9 @@ void EucledianHashTable::add(Item* item){
 int EucledianHashTable::hash(Item *item) {
     int sum = 0;
     int M = (int)pow(2.0,32.0) -5;
-    vector<int>h_i=computeGVector(item);
+    vector<int>*h_i=computeGVector(item);
     for(unsigned  int i=0; i< r_vector.size() ; i++){
-       sum += Util::my_mod(((int)r_vector[i])*h_i[i],M);
+       sum += Util::my_mod(((int)r_vector[i])*(*h_i)[i],M);
     }
 
     return Util::my_mod(sum,TableSize);
@@ -58,8 +58,8 @@ int EucledianHashTable::hash(Item *item) {
 
 vector< Item* > EucledianHashTable::findNcloserNeighbors(Item *item,double r){
     int bucket = hash(item);
-    vector<int>item_gVector=computeGVector(item);
-    item->setGVector(item_gVector);
+    vector<int>*item_gVector=computeGVector(item);
+    item->setGVector(*item_gVector);
     vector< Item* >ret;
     for(unsigned int i=0; i<Table[bucket].size(); i++) {
         bool match = true;
@@ -88,8 +88,8 @@ vector< Item* > EucledianHashTable::findNcloserNeighbors(Item *item,double r){
 
 pair<Item*,double> EucledianHashTable::findCloserNeighbor(Item *item){
     int bucket = hash(item);
-    vector<int>item_gVector=computeGVector(item);
-    item->setGVector(item_gVector);
+    vector<int>*item_gVector=computeGVector(item);
+    item->setGVector(*item_gVector);
     vector< pair<Item*,double> >ret;
     pair<Item*,double>min_pair(NULL,-1);
     int retrieved=0;
@@ -120,11 +120,12 @@ pair<Item*,double> EucledianHashTable::findCloserNeighbor(Item *item){
 
 }
 
-vector<int> EucledianHashTable::computeGVector(Item* item){
-    vector<int> h_i;
+vector<int>* EucledianHashTable::computeGVector(Item* item){
+    vector<int>* h_i= new vector<int>;
     for(unsigned  int i=0; i< item->getGVector().size() ; i++) {
-        h_i.push_back(H_vector[i]->hash(item));
+        h_i->push_back(H_vector[i]->hash(item));
     }
+
     return h_i;
 }
 

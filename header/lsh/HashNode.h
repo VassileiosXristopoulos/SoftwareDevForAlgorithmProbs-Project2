@@ -13,7 +13,7 @@ private:
     Item* my_item;
     vector<int>gVector;
 public:
-    HashNode(Item *item,vector<int>gvector);
+    HashNode(Item *item,vector<int>* gvector);
     ~HashNode();
     vector<int>getGvector();
     string getItemName();

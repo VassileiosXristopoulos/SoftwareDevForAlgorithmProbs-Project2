@@ -13,18 +13,18 @@ CosineHashTable::CosineHashTable(int size, int k) : AHashTable(size,k){
     this->k = k;
 }
 
-vector<int> CosineHashTable::computeGVector(Item *item) {
-    vector<int>ret=vector<int>(k);
+vector<int>* CosineHashTable::computeGVector(Item *item) {
+    vector<int>*ret= new vector<int>(k);
     for( int i=0; i<k ;i++){
-        ret[i] = cosine_vector[i]->hash(item);
+        (*ret)[i] = cosine_vector[i]->hash(item);
     }
     return ret;
 }
 
 int CosineHashTable::hash(Item *item) {
-    vector<int> table = computeGVector(item);
-    std::reverse(table.begin(),table.end());
-    return Util::intVectortoInteger(table);
+    vector<int>* table = computeGVector(item);
+    std::reverse(table->begin(),table->end());
+    return Util::my_mod(Util::intVectortoInteger(*table),TableSize);
 }
 
 void CosineHashTable::add(Item *item) {

@@ -4,9 +4,9 @@
 
 #include "../../header/lsh/HashNode.h"
 
-HashNode::HashNode(Item *item,vector<int> gvector) {
+HashNode::HashNode(Item *item,vector<int>* gvector) {
     my_item=item;
-    gVector=gvector;
+    gVector=*gvector;
 }
 
 HashNode::~HashNode() {

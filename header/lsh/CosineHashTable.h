@@ -16,7 +16,7 @@ private:
 public:
     CosineHashTable(int size,int k);
     ~CosineHashTable() override;
-    vector<int> computeGVector(Item* item) override;
+    vector<int>* computeGVector(Item* item) override;
     int hash(Item*item) override;
     void add(Item* item) override;
     vector<Item*>  findNcloserNeighbors(Item *item,double r) override;

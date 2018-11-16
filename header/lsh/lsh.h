@@ -17,6 +17,7 @@ private:
 
 public:
     lsh(int k,int L,int w,string& metric,DataSetMap *set);
+    ~lsh();
     vector<Item*> FindItemsInRange(Item * item, double r);
 };
 
