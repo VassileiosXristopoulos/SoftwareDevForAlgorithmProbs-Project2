@@ -13,6 +13,7 @@
 #include "hypercube/AHypercube.h"
 #include "Util.h"
 #include "lsh/lsh.h"
+#include "hypercube/cube.h"
 
 class ClusterMaster {
 private:
@@ -23,14 +24,15 @@ private:
     vector<Cluster*> Clusters;
     vector<int>Choises;
     lsh * lsh_master;
-    AHypercube * Hypercube;
+    cube* hypercube_master;
 
     void Initialization();
     void RandomSelection();
     void kmeanspp();
     void Assignement();
     void LloydsAssignment();
-    void LSHAssignment();
+    void RangeSearchAssignment(string&);
+    vector<Item*> GenericFindinRange(string&,Item*,double);
     void Update();
     void SetNextChoise();
     void ResetDataset();

@@ -31,7 +31,7 @@ struct Config_info{
     int numOf_hashTables;
     int lsh_k;
     int lsh_L;
-    int lsh_w;
+    int w;
     int cube_k;
     int cube_M;
     int cube_probes;

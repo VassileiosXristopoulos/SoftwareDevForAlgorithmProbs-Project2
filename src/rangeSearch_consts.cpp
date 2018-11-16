@@ -9,4 +9,6 @@ namespace rangeSearch_consts{
     int k = -1;
     int w = -1;
     int d = -1;
+    int M = -1;
+    int probes = -1;
 };

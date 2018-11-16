@@ -38,10 +38,11 @@ ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,st
     this->Dataset = set; // Keep a simple array with the dataset
     switch (Choises[1]){
         case 2:
-            lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.lsh_w, metric,set);
+            lsh_master = new lsh(config_info.lsh_k,config_info.lsh_L,config_info.w, metric,set);
             break;
         case 3:
-            // cube
+            hypercube_master = new cube(config_info.cube_k,config_info.w,config_info.cube_probes,config_info.cube_M,metric,
+                    set);
             break;
         default:
             break;
@@ -225,11 +226,11 @@ void ClusterMaster::Assignement() {
             LloydsAssignment();
             break;
         case 2:
-            LSHAssignment();
+            RangeSearchAssignment(*(new string("lsh")));
             // LSH
             break;
         case 3:
-            LloydsAssignment();
+            RangeSearchAssignment(*(new string("hypercube")));
             //cube
             break;
         default:
@@ -335,7 +336,7 @@ void ClusterMaster::ResetDataset() {
     }
 }
 
-void ClusterMaster::LSHAssignment() {
+void ClusterMaster::RangeSearchAssignment(string& method) {
 
     int items_returned;
     // copy of dataset for only non assigned items
@@ -349,28 +350,29 @@ void ClusterMaster::LSHAssignment() {
     /*----------------------ATTENTION: Until Loops are finished no item is inserted to cluster.  --------------------*/
     /*----------------------Reason is we would have to insert and delete from list.  --------------------*/
     /*----------------------Only when the algorithm decides the partitioning, we assign to lists  --------------------*/
+    double r = 0.1;
     do{
 
         items_returned = 0;
-        double r = 0.1;
+
 
         for(int i=0;i<Clusters.size();i++){ // for each cluster
-            vector<Item*>Ncloser = lsh_master->FindItemsInRange(Clusters[i]->GetCentroid(),r); // get items in range
+            vector<Item*>Ncloser = GenericFindinRange(method,Clusters[i]->GetCentroid(),r); // get items in range
             items_returned += Ncloser.size();
             for( int j=0;j<Ncloser.size(); j++){ // for each item in range
-                if( Ncloser[i]->GetCluster() == -1){  // if items doesn't belong to some cluster
-                    Ncloser[i]->SetCluster(i);
-                    nonAssignedItems->erase(Ncloser[i]); // keep only the non assigned items
+                if( Ncloser[j]->GetCluster() == -1){  // if items dont belong to some cluster
+                    Ncloser[j]->SetCluster(i);
+                    nonAssignedItems->erase(Ncloser[j]); // keep only the non assigned items
                 }
                 else{
                     // compute distance from it's current cluster's centroid
-                    double distFromOwner = Util::EucledianDistance(Ncloser[i]->getContent(),
-                            Clusters[Ncloser[i]->GetCluster()]->GetCentroid()->getContent());
+                    double distFromOwner = Util::EucledianDistance(Ncloser[j]->getContent(),
+                            Clusters[Ncloser[j]->GetCluster()]->GetCentroid()->getContent());
                     // compute distance from the cluster which got it in range as well
-                    double distFromcurr = Util::EucledianDistance(Ncloser[i]->getContent(),
+                    double distFromcurr = Util::EucledianDistance(Ncloser[j]->getContent(),
                             Clusters[i]->GetCentroid()->getContent());
                     if(distFromOwner>distFromcurr){ // if found closer cluster, assign to it
-                        Ncloser[i]->SetCluster(i);
+                        Ncloser[j]->SetCluster(i);
                     }
                 }
             }
@@ -432,6 +434,15 @@ void ClusterMaster::PrintResults() {
         }
     }
     cout<<endl<<endl<<endl;
+}
+
+vector<Item *> ClusterMaster::GenericFindinRange(string &method, Item * centroid, double r) {
+    if(method == "lsh"){
+        return lsh_master->FindItemsInRange(centroid,r);
+    }
+    else if(method == "hypercube"){
+        return hypercube_master->FindItemsInRange(centroid,r);
+    }
 }
 
 

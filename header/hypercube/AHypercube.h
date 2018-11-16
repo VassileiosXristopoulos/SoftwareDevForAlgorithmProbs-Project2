@@ -23,7 +23,7 @@ public:
     void add(Item* item);
     virtual double computeDistance(vector<int>&x,vector<int>&y) = 0;
     pair<string,double> findCloser(Item *item,int max,int probes);
-    vector<string> findRCloser(Item *item,int max,int probes,int radius);
+    vector<Item*> findRCloser(Item *item,int max,int probes,double radius);
     virtual int size() = 0;
 };
 

@@ -82,18 +82,19 @@ pair<string, double> AHypercube::findCloser(Item *item, int max, int probes) { /
     return min_item;
 }
 
-vector<string> AHypercube::findRCloser(Item *item, int max, int probes, int radius) {
+vector<Item*> AHypercube::findRCloser(Item *item, int max, int probes, double radius) {
     vector<int>bitVector = getBitVector(item); //getBitvector returns the right vector
     std::reverse(bitVector.begin(),bitVector.end());
     CubeEdge * currentEdge = edges[Util::intVectortoInteger(bitVector)];
     vector<Item*>elements = currentEdge->Elements();
-    vector <string> rNearest;
+    vector <Item*> rNearest;
     int elems_checked = 0;
     for(unsigned int i=0;i < elements.size() ;i++){
         if(elems_checked++ > max) return rNearest;
         double dist = computeDistance(item->getContent(),elements[i]->getContent());
-        if(dist<radius)
-            rNearest.push_back(elements[i]->getName());
+        if(dist<radius){
+            rNearest.push_back(elements[i]);
+        }
 
     }
     int hamminDist = 1, probes_checked = 0;
@@ -109,7 +110,7 @@ vector<string> AHypercube::findRCloser(Item *item, int max, int probes, int radi
                 if(elems_checked++ > max) return rNearest;
                 double dist = computeDistance(item->getContent(),items[j]->getContent());
                 if(dist<radius)
-                    rNearest.push_back(items[j]->getName());
+                    rNearest.push_back(items[j]);
             }
 
             if(++probes_checked==probes) return rNearest;

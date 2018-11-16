@@ -11,7 +11,7 @@
 #include "../header/lsh/lsh.h"
 #include "../header/rangeSearch_consts.h"
 
-int d,n;
+int n;
 
 
 DataSetMap::~DataSetMap() {
@@ -74,8 +74,6 @@ void DataSetMap::InsertFile(string inputFile) {
             continue;
         }
         Map.push_back(item);
-
-        d = static_cast<int>(element.size());
 
     }
 

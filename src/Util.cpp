@@ -33,7 +33,7 @@ int Util::intVectortoInteger(vector<int> table) { //convert vector<int> to integ
 }
 
 vector<int> Util::intToIntVector(int number, int d) { //convert int to vector<int>
-    vector<int> ret = vector<int>(d);
+    vector<int> ret = vector<int>((unsigned long)d);
     for ( int i = 0; i < d; i++) {
         ret[d - 1 - i] = (1 << i & number) != 0;
     }
@@ -94,138 +94,7 @@ vector<string> Util::Split(string &line) { //split a string by spaces and return
     return element;
 }
 
-Lsh_arguments Util::getLshArguments(int argv,char*argc[]) { //get arguments for lsh. Depends on command line arguments
-    Lsh_arguments args;
-    if(argv>=7){
-        if( argv == 11 ){
-            if(argc[2]==NULL || argc[4]==NULL || argc[6]==NULL || argc[8]==NULL || argc[10]==NULL ){
-                cout << "Invalid Arguments" << endl;
-                exit(0);
-            }
 
-            args.inputFile = "Input/" + string(argc[6]);
-            args.queryFile = "Input/" + string(argc[8]);
-            //trick - modified order of arguments to implement rerun
-            args.k = atoi(argc[2]);
-            args.L = atoi(argc[4]);
-            if( args.k<=0 || args.L<=0 ){
-                cout << "k and/or L arguments not given properly" << endl;
-                exit(0);
-            }
-            args.outputFIle = "Output/" + string(argc[10]);
-        }
-        else if( argv == 7){
-            if(argc[2]==NULL || argc[4]==NULL || argc[6]==NULL){
-                cout << "Invalid Arguments" << endl;
-                exit(0);
-            }
-            args.inputFile = "Input/" + string(argc[2]);
-            args.queryFile = "Input/" + string(argc[4]);
-            args.k = 4;
-            args.L = 5;
-            args.outputFIle = "Output/" + string(argc[6]);
-        }
-        else {
-            cout << "Wrong arguments!" << endl;
-            exit(0);
-        }
-
-
-    }
-    else {
-        if (argv == 5) {
-            args.k = atoi(argc[2]);
-            args.L = atoi(argc[4]);
-
-        } else if (argv == 1) {
-            args.k = 4;
-            args.L = 5;
-        } else {
-            cout << "Wrong arguments!" << endl;
-            exit(0);
-        }
-        cout << "Please give path of dataset:";
-        cin >> args.inputFile;
-        cout << endl << "Please give path of query file:";
-        cin >> args.queryFile;
-        args.outputFIle = "Output/output.txt";
-        cout << "Output file generated at: "<< args.outputFIle << endl;
-    }
-    std::ifstream inputfile(args.inputFile);
-    std::ifstream queryfile(args.queryFile);
-    if(!(inputfile.good() && queryfile.good())){
-        cout << "Not existing Input files!"<<endl;
-        exit(0);
-    }
-    return args;
-}
-
-Cube_arguments Util::getCubeArguments(int argv,char*argc[]) { //get arguments for cube. Depends on command line
-    // arguments
-    Cube_arguments args;
-    if(argv>=7){
-        if (argv == 13) {
-            if (argc[2] == NULL || argc[4] == NULL || argc[6] == NULL || argc[8] == NULL || argc[10] == NULL ||
-                argc[12] == NULL) {
-                cout << "Invalid Arguments" << endl;
-                exit(0);
-            }
-
-            args.inputFile = "Input/" + string(argc[8]);
-            args.queryFile = "Input/" + string(argc[10]);
-            args.k = atoi(argc[2]);
-            args.M = atoi(argc[4]);
-            if (args.k <= 0 || args.M <= 0) {
-                cout << "k and/or M arguments not given properly" << endl;
-                exit(0);
-            }
-            args.probes = atoi(argc[6]);
-            args.outputFIle = "Output/" + string(argc[12]);
-        } else if (argv == 7 && string(argc[1])=="-d") {
-            if (argc[2] == NULL || argc[4] == NULL || argc[6] == NULL) {
-                cout << "Invalid Arguments" << endl;
-                exit(0);
-            }
-            args.inputFile = "Input/" + string(argc[2]);
-            args.queryFile = "Input/" + string(argc[4]);
-            args.k = -1;
-            args.M = 10;
-            args.probes = 2;
-            args.outputFIle = "Output/" + string(argc[6]);
-        } else {
-            cout << "Wrong arguments!" << endl;
-            exit(0);
-        }
-    }
-    else {
-        if (argv == 7) {
-            args.k = atoi(argc[2]);
-            args.M = atoi(argc[4]);
-            args.probes = atoi(argc[6]);
-
-        } else if (argv == 1) {
-            args.k = -1;
-            args.M = 10;
-            args.probes = 2;
-        } else {
-            cout << "Wrong arguments!" << endl;
-            exit(0);
-        }
-        cout << "Please give path of dataset:";
-        cin >> args.inputFile;
-        cout << endl << "Please give path of query file:";
-        cin >> args.queryFile;
-        args.outputFIle = "Output/output.txt";
-        cout << "Output file generated at: "<< args.outputFIle << endl;
-    }
-    std::ifstream inputfile(args.inputFile);
-    std::ifstream queryfile(args.queryFile);
-    if(!(inputfile.good() && queryfile.good())){
-        cout << "Not existing Input files!"<<endl;
-        exit(0);
-    }
-    return args;
-}
 
 Config_info Util::GetConfiguration(string config_file) { //TODO: implement text before numbers and default cases
     std::ifstream config(config_file);
@@ -235,7 +104,7 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
     }
     string temp;
     vector<string> wordVector;
-    Config_info info;
+    Config_info info ;
 
     temp = safe_getline(config); // get the first line
     wordVector = Split(temp);    // split it to a vector (easier access to words)
@@ -293,7 +162,7 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
     temp = safe_getline(config);
     wordVector = Split(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
-        info.lsh_w = safe_atoi(wordVector[1]);
+        info.w = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
@@ -318,7 +187,6 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
 }
 
 int Util::safe_atoi(string input) {
-    int ret;
     try {
         return stoi(input);
     }
@@ -335,7 +203,7 @@ string Util::safe_getline(std::ifstream &config) {
         getline(config,temp);
         return  temp;
     }
-    catch (ifstream::failure e){
+    catch (ifstream::failure &e){
         cout <<"Cannot read file" <<endl;
         exit(0);
     }

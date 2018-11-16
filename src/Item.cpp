@@ -8,6 +8,7 @@
 
 Item::Item(string name){
     this->name = name;
+    this->cluster = -1;
 }
 Item::Item(vector<string> &element){
 
@@ -17,6 +18,8 @@ Item::Item(vector<string> &element){
     for(unsigned int i=0;i<element.size();i++){
         content.push_back(atoi(element[i].c_str()));
     }
+    this->cluster = -1;
+
 }
 
 

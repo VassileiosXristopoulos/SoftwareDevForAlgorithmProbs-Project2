@@ -18,7 +18,7 @@ private:
     string name;
     vector<int>content;
     vector<int>g_vector=vector<int>(rangeSearch_consts::k);
-    int cluster = -1;
+    int cluster;
 public:
     Item(string);
     Item(vector<string>&element);

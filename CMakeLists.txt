@@ -21,6 +21,8 @@ set(cluster
         "src/hypercube/AHypercube.cpp"
         "src/hypercube/EucledianHypercube.cpp"
         "src/lsh/lsh.cpp"
-        "src/rangeSearch_consts.cpp")
+        "src/rangeSearch_consts.cpp"
+        "src/hypercube/cube.cpp"
+        )
 
 add_executable(cluster ${cluster})

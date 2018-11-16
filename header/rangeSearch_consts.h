@@ -9,6 +9,8 @@ namespace rangeSearch_consts{
     extern int k;
     extern int w;
     extern int d;
+    extern int M;
+    extern int probes;
 };
 
 #endif //CLUSTER_RANGESEARCH_CONSTS_H
