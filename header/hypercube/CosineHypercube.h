@@ -21,7 +21,7 @@ public:
     explicit CosineHypercube(int d);
     ~CosineHypercube();
     vector<int> getBitVector(Item *item) override;
-    double computeDistance(vector<int>&x,vector<int>&y) override;
+    double computeDistance(vector<double>&x,vector<double>&y) override;
     int size() override;
 
 };

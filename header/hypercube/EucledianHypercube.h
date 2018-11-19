@@ -16,7 +16,7 @@ public:
     explicit EucledianHypercube(int d);
     ~EucledianHypercube();
     vector<int> getBitVector(Item* item) override;
-    double computeDistance(vector<int>&x,vector<int>&y) override;
+    double computeDistance(vector<double>&x,vector<double>&y) override;
     int size();
 };
 

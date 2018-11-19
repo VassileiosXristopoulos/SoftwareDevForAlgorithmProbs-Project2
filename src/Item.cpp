@@ -16,22 +16,23 @@ Item::Item(vector<string> &element){
     element.erase(element.begin());
 
     for(unsigned int i=0;i<element.size();i++){
-        content.push_back(atoi(element[i].c_str()));
+        content.push_back(stof(element[i]));
     }
     this->cluster = -1;
 
 }
 
 
-vector<int> &Item::getContent() {
+vector<double> &Item::getContent() {
     return content;
 }
 string Item::getName(){
     return name;
 }
 void Item::setGVector(vector<int>& h_i) {
-    for(unsigned int i=0;i<g_vector.size(); i++){
-        g_vector[i] = h_i[i];
+    g_vector.clear();
+    for(unsigned int i=0;i<h_i.size(); i++){
+        g_vector.push_back(h_i[i]);
     }
 }
 
@@ -55,12 +56,12 @@ int Item::size() {
     return size;
 }
 
-void Item::SetContent(vector<int>& content) {
+void Item::SetContent(vector<double>& content) {
     this->content = content;
 
 }
 
-int Item::GetPoint(int p) {
+double Item::GetPoint(int p) {
     return content[p];
 }
 

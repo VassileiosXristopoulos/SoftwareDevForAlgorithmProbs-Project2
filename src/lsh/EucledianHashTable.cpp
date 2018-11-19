@@ -121,9 +121,9 @@ pair<Item*,double> EucledianHashTable::findCloserNeighbor(Item *item){
 }
 
 vector<int>* EucledianHashTable::computeGVector(Item* item){
-    vector<int>* h_i= new vector<int>;
-    for(unsigned  int i=0; i< item->getGVector().size() ; i++) {
-        h_i->push_back(H_vector[i]->hash(item));
+    vector<int>* h_i= new vector<int>(rangeSearch_consts::k);
+    for(unsigned  int i=0; i< h_i->size() ; i++) {
+        (*h_i)[i] = H_vector[i]->hash(item);
     }
 
     return h_i;

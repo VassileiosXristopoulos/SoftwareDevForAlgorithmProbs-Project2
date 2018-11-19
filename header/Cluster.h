@@ -13,6 +13,7 @@ class Cluster {
 private:
     Item * Centroid;
     map<string,Item*>Members;
+    double ShilouetteValue;
     bool PAM();
     bool kmeans();
 public:
@@ -24,9 +25,11 @@ public:
     void DeleteMember(string);
     void InsertMember(Item*);
     bool ReplaceElements(vector<Item*>);
-    vector<string> GetMembers();
+    map<string,Item*> GetMembers();
     bool Update(int);
     void FlushClusterMembers();
+    void ComputeSilhouette();
+    double GetSilhouette();
     int size();
 };
 

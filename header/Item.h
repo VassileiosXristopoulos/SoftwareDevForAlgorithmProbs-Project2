@@ -16,19 +16,19 @@ using namespace std;
 class Item {
 private:
     string name;
-    vector<int>content;
-    vector<int>g_vector=vector<int>(rangeSearch_consts::k);
+    vector<double>content;
+    vector<int>g_vector;
     int cluster;
 public:
     Item(string);
     Item(vector<string>&element);
     ~Item();
-    vector<int>& getContent();
-    void SetContent(vector<int>&);
+    vector<double>& getContent();
+    void SetContent(vector<double>&);
     string getName();
     void setGVector(vector<int>& h_i);
     vector<int>& getGVector();
-    int GetPoint(int);
+    double GetPoint(int);
     int size();
     void SetCluster(int);
     int GetCluster();

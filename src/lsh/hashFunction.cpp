@@ -28,7 +28,7 @@ hashFunction::hashFunction() {
 hashFunction::~hashFunction() = default;
 
 int hashFunction::hash(Item* item) {
-    vector<int>p_item = item->getContent();
+    vector<double>p_item = item->getContent();
     float sum=this->t;
     for(unsigned int i=0; i<p_item.size() ;i++){
         sum += ( (float) p_item[i] )*v[i];

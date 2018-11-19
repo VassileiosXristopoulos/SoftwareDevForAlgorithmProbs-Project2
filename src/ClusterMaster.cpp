@@ -185,13 +185,14 @@ void ClusterMaster::LloydsAssignment() {
         /*--------- compute the distance from the closest cluster ------------*/
 
         /* set min as the distance of the item with the "first" centroid */
-        int min = (int)Util::EucledianDistance(dataSetItem->getContent(),Clusters[0]->GetCentroid()->getContent());
+        double min = Util::EucledianDistance(dataSetItem->getContent(),Clusters[0]->GetCentroid()->getContent());
         int closerCluster = 0; //set Cluster 0 as the closest
 
         /* find minimum distance */
 
         for(int j = 1; j<Clusters.size(); j++ ){
-            int dist = (int)Util::EucledianDistance(dataSetItem->getContent(),Clusters[j]->GetCentroid()->getContent());
+            double dist = Util::EucledianDistance(dataSetItem->getContent(),Clusters[j]->GetCentroid()->getContent
+            ());
             if(dist<min){
                 min = dist;
                 closerCluster = j;
@@ -447,12 +448,22 @@ void ClusterMaster::PrintResults() {
         }
     }
     cout<<endl;
+  /*  vector<double>silhouette = Silhouette();
+    cout<< "Silhouette :[";
+    if(silhouette.size()>0){
+        cout << silhouette[0];
+        for(int j=1;j<silhouette.size();j++){
+            cout << ","<<silhouette[j];
+        }
+    }
+    cout<<"]"<<endl;*/
+
     if(complete){ //complete printing
         cout << "/*------------------- Items in each cluster -----------------*/"<<endl;
         for(int i=0; i<Clusters.size();i++) {
             cout << "CLUSTER-" << i + 1 <<" { ";
-            for(int j=0;j<Clusters[i]->GetMembers().size();j++){
-                cout << Clusters[i]->GetMembers()[j]<<" ";
+            for(auto const& j: Clusters[i]->GetMembers()){
+                cout << j.first <<" ";
             }
             cout<<" }"<<endl;
         }
@@ -467,6 +478,81 @@ vector<Item *> ClusterMaster::GenericFindinRange(string &method, Item * centroid
     else if(method == "hypercube"){
         return hypercube_master->FindItemsInRange(centroid,r);
     }
+}
+
+vector<double> ClusterMaster::Silhouette() {
+    vector<double>SilhouetteVector;
+    double stotal = 0;
+    for(int i=0;i<Clusters.size();i++){ // for each cluster
+        double s_i = 0;
+        Cluster *Cluster_i = Clusters[i];
+        if(Clusters[i]->size()==1){
+            cout <<"this going to give nan"<<endl;
+        }
+        for(auto const& x_i: Cluster_i->GetMembers()){
+            /*---- compute a(i) for an element of Cluster i -----*/
+
+            double a_i = 0;
+            for(auto const & x_j : Cluster_i->GetMembers()) { // iterate all elements of same cluster
+                if (x_i.first != x_j.first) { // if not the same Member, different name
+                    a_i += Util::EucledianDistance(x_j.second->getContent(),x_i.second->getContent());
+                }
+            }
+            if(Cluster_i->GetMembers().size() -1 > 0)
+                a_i /= (Cluster_i->GetMembers().size() -1);
+
+            /*---------------------------------------------------*/
+
+            /*------------ find the neighboor cluster -----------*/
+            double min_dist = -1;
+            int neighboor = -1;
+            for(int j = 0;j<Clusters.size(); j++){ // iterate all the Clusters to find the closest
+                if( i != j){ // if not the same cluster
+                    if(min_dist == -1){ // if we haven't computed another distance
+                        min_dist = Util::EucledianDistance(Cluster_i->GetCentroid()->getContent(),
+                                Clusters[j]->GetCentroid()->getContent());
+                        neighboor = j; // declare as closest cluster the cluster j
+                    }
+                    else{ // keep the minimum
+                        double dist = Util::EucledianDistance(Clusters[i]->GetCentroid()->getContent(),
+                                                              Clusters[j]->GetCentroid()->getContent());
+                        if(dist < min_dist){
+                            min_dist = dist;
+                            neighboor = j;
+                        }
+                    }
+                }
+            }
+
+            /*--------------------------------------------------*/
+
+            /*----------------- compute b(i) -------------------*/
+            double b_i = 0;
+            if(neighboor >= 0){
+                // compute distance of x_i from all elements in neighboor cluster
+                for(auto const & x_j : Clusters[neighboor]->GetMembers()){
+                    b_i += Util::EucledianDistance(x_i.second->getContent(),x_j.second->getContent());
+                }
+                b_i /= Clusters[neighboor]->GetMembers().size();
+            }
+            if(Clusters[neighboor]->size() > 0)
+                b_i /= Clusters[neighboor]->size();
+            /*--------------------------------------------------*/
+            if(a_i >0 || b_i>=0)
+                s_i += (b_i-a_i)/max(a_i,b_i);
+
+        }
+        if(Clusters[i]->GetMembers().size()-1 > 0)
+            s_i /= (Clusters[i]->GetMembers().size()-1); // finally compute average s(p)
+
+
+        SilhouetteVector.push_back( s_i ); // push it to the vector
+        stotal += s_i; // add it to the sum that will become the stotal
+    }
+    if(Clusters.size()>0)
+        stotal /= Clusters.size();
+    SilhouetteVector.push_back(stotal);
+    return SilhouetteVector;
 }
 
 

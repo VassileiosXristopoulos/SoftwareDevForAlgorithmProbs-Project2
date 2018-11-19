@@ -43,7 +43,7 @@ vector<int> EucledianHypercube::getBitVector(Item *item) {
     return  bitVector;
 }
 
-double EucledianHypercube::computeDistance(vector<int> &x, vector<int> &y) {
+double EucledianHypercube::computeDistance(vector<double> &x, vector<double> &y) {
     return Util::EucledianDistance(x,y);
 }
 

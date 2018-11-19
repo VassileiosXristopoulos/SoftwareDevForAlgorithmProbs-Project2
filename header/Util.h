@@ -43,7 +43,7 @@ class Util {
 public:
     static int my_mod(int x, int y);
 
-    static double EucledianDistance(vector<int> x, vector<int> y);
+    static double EucledianDistance(vector<double> x, vector<double> y);
 
     static int intVectortoInteger(vector<int> table);
 
@@ -53,9 +53,9 @@ public:
 
     static void getHammingCloseVectors( int changesLeft, std::vector<int>& str, const int i,
             vector<vector<int>>&res );
-    static double cosineDistance(vector<int>&x,vector<int>&y);
-    static vector<string> Split(string &line);
-
+    static double cosineDistance(vector<double>&x,vector<double>&y);
+    static vector<string> SplitBlanks(string &line);
+    static vector<string> SplitCommas(string &line);
     static Lsh_arguments getLshArguments(int argv,char *argc[]);
     static Cube_arguments getCubeArguments(int argv,char *argc[]);
     static Config_info GetConfiguration(string);

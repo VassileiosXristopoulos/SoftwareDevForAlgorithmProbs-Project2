@@ -27,6 +27,7 @@ private:
     cube* hypercube_master;
     Config_info config_info;
     string metric;
+    double SilhouetteValue;
 
     void Initialization();
     void RandomSelection();
@@ -39,10 +40,12 @@ private:
     void SetNextChoise();
     void ResetDataset();
     void PrintResults();
+    vector<double> Silhouette();
 public:
     ClusterMaster(Config_info, DataSetMap*, int[],string&,bool);
     ~ClusterMaster();
     void Clustering();
+
 
 
 

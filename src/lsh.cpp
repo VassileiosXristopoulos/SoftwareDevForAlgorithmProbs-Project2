@@ -71,7 +71,7 @@ int main(int argv,char **argc){
 
             line = FileLine.substr(0, FileLine.size() - 1); //trim the last character of line -- get pure the id's
             // and the coordinates
-            vector<string> element = Util::Split(line); // get string vector which has at index 0 the id and then the
+            vector<string> element = Util::SplitCommas(line); // get string vector which has at index 0 the id and then the
             // coordinates
 
             Item *item = new Item(element); //construct an object with information about the query item

@@ -12,7 +12,7 @@
 int Util::my_mod(int x, int y) {
     return (x % y + y) % y;
 }
-double Util::EucledianDistance(vector<int> x, vector<int> y) {
+double Util::EucledianDistance(vector<double> x, vector<double> y) {
     double distance=0;
     for (unsigned int j = 0; j < x.size(); j++) {
         distance += pow(x[j] - y[j], 2);
@@ -67,7 +67,7 @@ void Util::getHammingCloseVectors( int changesLeft, vector<int>& str, const int 
     getHammingCloseVectors(changesLeft,str, i-1,res);
 }
 
-double Util::cosineDistance(vector<int> &x, vector<int> &y) {
+double Util::cosineDistance(vector<double> &x, vector<double> &y) {
     double sum=0,partial_sumX=0,partial_sumY=0;
 
     for(unsigned int i=0;i<x.size();i++){
@@ -80,7 +80,7 @@ double Util::cosineDistance(vector<int> &x, vector<int> &y) {
     return 1 - sum/(partial_sumX*partial_sumY);
 }
 
-vector<string> Util::Split(string &line) { //split a string by spaces and return a vector<string>
+vector<string> Util::SplitBlanks(string &line) { //split a string by spaces and return a vector<string>
     vector<string> element;
     size_t pos = line.find(' ');
     size_t startPos = 0;
@@ -88,6 +88,20 @@ vector<string> Util::Split(string &line) { //split a string by spaces and return
         element.push_back(line.substr(startPos, pos - startPos));
         startPos = pos + 1;
         pos = line.find(' ', startPos);
+    }
+    element.push_back(line.substr(startPos, pos - startPos));
+
+    return element;
+}
+
+vector<string> Util::SplitCommas(string &line) {
+    vector<string> element;
+    size_t pos = line.find(',');
+    size_t startPos = 0;
+    while (pos != string::npos) {
+        element.push_back(line.substr(startPos, pos - startPos));
+        startPos = pos + 1;
+        pos = line.find(',', startPos);
     }
     element.push_back(line.substr(startPos, pos - startPos));
 
@@ -107,7 +121,7 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
     Config_info info ;
 
     temp = safe_getline(config); // get the first line
-    wordVector = Split(temp);    // split it to a vector (easier access to words)
+    wordVector = SplitBlanks(temp);    // split it to a vector (easier access to words)
     if(wordVector.size() == 2 && !wordVector[1].empty()){ // if it has 2 words k is the second (space separated)
         info.k = safe_atoi(wordVector[1]);
     }
@@ -122,7 +136,7 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
 
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size()==2 && !wordVector[1].empty()) {
         info.numof_hashFunctions = safe_atoi(wordVector[1]);
     }
@@ -135,7 +149,7 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.numOf_hashTables = safe_atoi(wordVector[1]);
     }
@@ -148,37 +162,37 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.lsh_k = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.lsh_L = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.w = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.cube_k = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.cube_M = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
-    wordVector = Split(temp);
+    wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.cube_probes = safe_atoi(wordVector[1]);
     }
@@ -259,5 +273,7 @@ int* Util::GetUserChoise() {
     }
     return Choises;
 }
+
+
 
 

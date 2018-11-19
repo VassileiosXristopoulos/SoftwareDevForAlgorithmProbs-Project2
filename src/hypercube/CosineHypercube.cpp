@@ -37,7 +37,7 @@ vector<int> CosineHypercube::getBitVector(Item*item){
 }
 
 
-double CosineHypercube::computeDistance(vector<int>&x,vector<int>&y) {
+double CosineHypercube::computeDistance(vector<double>&x,vector<double>&y) {
     return Util::cosineDistance(x,y);
 }
 

@@ -66,7 +66,7 @@ void DataSetMap::InsertFile(string inputFile) {
     for( std::string line; getline( input, FileLine ); ) {
 
         line = FileLine.substr(0, FileLine.size() - 1);
-        vector<string> element = Util::Split(line);
+        vector<string> element = Util::SplitCommas(line);
         Item *item = new Item(element);
 
         if(element.size()<=0){

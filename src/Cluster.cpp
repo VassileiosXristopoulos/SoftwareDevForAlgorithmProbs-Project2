@@ -84,26 +84,40 @@ bool Cluster::Update(int algorithm) {
 }
 
 int Cluster::size() {
-    return this->Members.size();
+    return (int)this->Members.size();
 }
 
 bool Cluster::PAM() {
     if(Members.empty()) return true;
     vector<pair<double,string>>distances;
+    double min_sum = -1.0;
+    Item *newCentroid = new Item("");
     for(auto const& i : Members) { // for each element of Cluster
         Item * element_i = i.second;
 
         double sum =0; // sum of distances of items from element_i (to be centroid)
         for(auto const& j : Members){ // get every member of cluster
             Item * element_j = j.second;
-            if(element_i->getName() != element_j->getName()){ // except itself
-                sum += Util::EucledianDistance(element_i->getContent(),element_j->getContent());
+            if(element_i->getName() != element_j->getName()) { // except itself
+                sum += Util::EucledianDistance(element_i->getContent(), element_j->getContent());
             }
+            if(min_sum != -1 && sum > min_sum) // if until now sum greater than min sum, stop searching
+                break;
         }
-        distances.push_back(make_pair(sum,i.first));
-    }
+        if(min_sum == -1.0){
+            newCentroid = element_i;
+            min_sum = sum;
+        }
+        else if(min_sum>sum){
+            newCentroid = element_i;
+            min_sum = sum;
+        }
 
-    double min = distances[0].first;
+//        distances.push_back(make_pair(sum,i.first));
+    }
+    return newCentroid->getName() == GetCentroid()->getName();
+
+    /* double min = distances[0].first;
     string newCentroid = Members.begin()->first;
     for(int j=1; j<distances.size(); j++){
         if(distances[j].first<min){
@@ -117,7 +131,7 @@ bool Cluster::PAM() {
         return true;
     }
     Centroid = NewCentroid;
-    return false;
+    return false;*/
 }
 
 
@@ -132,7 +146,7 @@ bool Cluster::kmeans() {
     Item * newCentroid = new Item("");
     int totalElements = static_cast<int>(Members.size());
     int dimensions = static_cast<int>(Members.begin()->second->getContent().size());
-    vector<int>Points = vector<int>(dimensions,0); // set size to be the same with Item's content, init all with 0
+    vector<double>Points = vector<double>(dimensions,0); // set size to be the same with Item's content, init all with 0
 
     for(auto const& i : Members){ // for each element of Cluster
         Item * element_i = i.second;
@@ -146,11 +160,21 @@ bool Cluster::kmeans() {
 
     newCentroid->SetContent(Points);
 
-    if (std::equal(Centroid->getContent().begin(), Centroid->getContent().begin() + Centroid->getContent().size(),
+   /* if (std::equal(Centroid->getContent().begin(), Centroid->getContent().begin() + Centroid->getContent().size(),
             newCentroid->getContent()
     .begin())){ // if the centroid remains the same (condition checks if 2 contents are equal)
         return true;
+    }*/
+    bool same = true;
+    for(int i=0;i<Centroid->getContent().size();i++){
+        // check if the centroid remains the same (condition checks if 2 contents are  equal)
+        if(Centroid->getContent()[i] != newCentroid->getContent()[i]){
+            same = false;
+            break;
+        }
     }
+    if(same)
+        return true;
 
     this->Centroid = newCentroid;
     return false;
@@ -162,12 +186,26 @@ void Cluster::FlushClusterMembers() {
     this->Members.clear();
 }
 
-vector<string> Cluster::GetMembers() {
-    vector<string> members;
-    for(auto const& i : Members){
-        members.push_back(i.first);
+map<string,Item*> Cluster::GetMembers() {
+    return this->Members;
+}
+
+void Cluster::ComputeSilhouette() {
+    for(auto const & i : Members){ // for each member i
+        double a_i = 0;
+        for(auto const & x : Members){
+            if(i.first != x.first){ // if not the same Member, different name
+                a_i += Util::EucledianDistance(i.second->getContent(),x.second->getContent());
+            }
+        }
+        a_i /= (Members.size() -1);
+
+
     }
-    return members;
+}
+
+double Cluster::GetSilhouette() {
+    return 0;
 }
 
 
