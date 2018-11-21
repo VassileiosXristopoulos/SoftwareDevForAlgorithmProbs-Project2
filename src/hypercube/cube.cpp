@@ -27,10 +27,14 @@ cube::cube(int k, int w, int probes, int M, string &metric, DataSetMap *set) {
 vector<Item *> cube::FindItemsInRange(Item *centroid, double r) {
     vector<Item*>ret;
     vector<Item*> items= hypercube->findRCloser(centroid,rangeSearch_consts::M,rangeSearch_consts::probes,r);
-    for(int i=0;i<items.size();i++){
+    for(unsigned int i=0;i<items.size();i++){
         if(centroid->GetCluster() != items[i]->GetCluster()){ // return only those NOT already in the cluster
             ret.push_back(items[i]);
         }
     }
     return ret;
+}
+
+cube::~cube() {
+    delete (hypercube);
 }

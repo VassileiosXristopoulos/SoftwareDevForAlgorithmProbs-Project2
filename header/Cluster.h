@@ -13,7 +13,6 @@ class Cluster {
 private:
     Item * Centroid;
     map<string,Item*>Members;
-    double ShilouetteValue;
     bool PAM();
     bool kmeans();
 public:

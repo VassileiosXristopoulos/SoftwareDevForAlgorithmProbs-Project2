@@ -16,9 +16,11 @@ normal_distribution<float> distribution(0,1);
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric,string& output_file,bool
+ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, vector<int> V,string& metric,string& output_file,
+        bool
 complete) {
 
+    outfile.open(output_file);
     this->complete = complete; // for complete printing
     this->config_info = config_info;
     this->metric = metric;
@@ -39,6 +41,8 @@ complete) {
             Choises.push_back(V[i]);
         }
     }
+    lsh_master= nullptr;
+    hypercube_master= nullptr;
     // we nead this dataset at every case because of initialization step
     this->Dataset = set; // Keep a simple array with the dataset
     switch (Choises[1]){
@@ -60,7 +64,15 @@ complete) {
  * Destructor
  */
 ClusterMaster::~ClusterMaster() {
-
+    if(lsh_master != nullptr){
+        delete(lsh_master);
+    }
+    if(hypercube_master != nullptr){
+        delete(hypercube_master);
+    }
+    for(auto const& i: Clusters)
+        delete i;
+    outfile.close();
 }
 
 
@@ -187,7 +199,8 @@ void ClusterMaster::kmeanspp() {
         nonCentroidMap->erase(nonCentroidMap->at(newCentroid));
         Di.erase(Di.begin()+newCentroid);
     }
-
+    nonCentroidMap->clean();
+    delete (nonCentroidMap);
 }
 
 
@@ -312,6 +325,7 @@ void ClusterMaster::SetNextChoise() {
         if(lsh_master != nullptr){
             delete(lsh_master);
         }
+        lsh_master= nullptr;
         Choises[1] = 3;
         Choises[2] = 1;
         hypercube_master = new cube(config_info.cube_k,config_info.w,config_info.cube_probes,config_info.cube_M,metric,
@@ -324,6 +338,7 @@ void ClusterMaster::SetNextChoise() {
         if(hypercube_master != nullptr){
             delete(hypercube_master);
         }
+        hypercube_master= nullptr;
         Choises[0] = 2;
         Choises[1] = 1;
         Choises[2] = 1;
@@ -343,6 +358,7 @@ void ClusterMaster::SetNextChoise() {
         if(lsh_master != nullptr){
             delete(lsh_master);
         }
+        lsh_master= nullptr;
         Choises[1] = 3;
         Choises[2] = 1;
         hypercube_master = new cube(config_info.cube_k,config_info.w,config_info.cube_probes,config_info.cube_M,metric,
@@ -356,6 +372,7 @@ void ClusterMaster::SetNextChoise() {
         if(hypercube_master != nullptr){
             delete(hypercube_master);
         }
+        hypercube_master= nullptr;
     }
 
 
@@ -449,12 +466,13 @@ void ClusterMaster::RangeSearchAssignment(string& method) {
         }
 
     }
-
+    nonAssignedItems->clean();
+    delete (nonAssignedItems);
+    delete (&method);
 }
 
 void ClusterMaster::PrintResults(double elapsed_time) {
-    ofstream outfile;
-    outfile.open(output_file);
+
     outfile <<"Algorithm " << Choises[0] <<"."<<Choises[1]<<"."<<Choises[2]<<endl<<endl;
     for(unsigned int i=0; i<Clusters.size();i++){
         outfile <<"CLUSTER-"<<i+1<<" { size:"<<Clusters[i]->size() <<" Centroid: ";
@@ -475,7 +493,7 @@ void ClusterMaster::PrintResults(double elapsed_time) {
     outfile<< "Silhouette :[";
     if(silhouette.size()>0){
         outfile << silhouette[0];
-        for(int j=1;j<silhouette.size();j++){
+        for(unsigned int j=1;j<silhouette.size();j++){
             outfile << ","<<silhouette[j];
         }
     }
@@ -492,7 +510,7 @@ void ClusterMaster::PrintResults(double elapsed_time) {
         }
     }
     outfile<<endl<<endl<<endl;
-    outfile.close();
+
 }
 
 vector<Item *> ClusterMaster::GenericFindinRange(string &method, Item * centroid, double r) {

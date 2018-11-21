@@ -16,7 +16,9 @@ int n;
 
 DataSetMap::~DataSetMap() {
     for(unsigned int i=0; i<Map.size(); i++){
-        delete(Map[i]);
+        if(Map[i] != nullptr) {
+            delete (Map[i]);
+        }
     }
 }
 
@@ -66,7 +68,7 @@ void DataSetMap::InsertFile(string inputFile) {
     for( std::string line; getline( input, FileLine ); ) {
 
         line = FileLine.substr(0, FileLine.size() - 1);
-        vector<string> element = Util::SplitCommas(line);
+        vector<string> element = Util::SplitBlanks(line);
         Item *item = new Item(element);
 
         if(element.size()<=0){
@@ -89,6 +91,12 @@ void DataSetMap::erase(Item *item) {
     unsigned int pos = (unsigned int)(find(Map.begin(), Map.end(), item) - Map.begin());
     if(pos<Map.size()){
         Map.erase(Map.begin()+pos);
+    }
+}
+
+void DataSetMap::clean() {
+    for(unsigned int i=0;i<Map.size();i++){
+        Map[i] = nullptr;
     }
 }
 

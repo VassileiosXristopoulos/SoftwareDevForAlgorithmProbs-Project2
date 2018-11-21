@@ -25,6 +25,7 @@ public:
     Item* at(int index);
     void InsertFile(string file);
     void erase(Item *);
+    void clean();
 };
 
 

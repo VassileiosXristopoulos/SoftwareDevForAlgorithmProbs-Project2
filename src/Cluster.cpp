@@ -6,7 +6,6 @@
 #include "../header/Util.h"
 
 Cluster::~Cluster() {
-    Centroid = nullptr;
 }
 
 /**
@@ -83,7 +82,7 @@ bool Cluster::PAM() {
     if(Members.empty()) return true;
     vector<pair<double,string>>distances;
     double min_sum = -1.0;
-    Item *newCentroid = new Item("");
+    Item *newCentroid;
     for(auto const& i : Members) { // for each element of Cluster
         Item * element_i = i.second;
 
@@ -106,7 +105,7 @@ bool Cluster::PAM() {
         }
     }
 
-    for(int i=0;i<Centroid->getContent().size();i++){
+    for(unsigned int i=0;i<Centroid->getContent().size();i++){
         // check if the centroid remains the same (condition checks if 2 contents are  equal)
         if(Centroid->getContent()[i] != newCentroid->getContent()[i]){
             this->Centroid = newCentroid;
@@ -127,14 +126,14 @@ bool Cluster::PAM() {
 bool Cluster::kmeans() {
     if(Members.empty()) return true;
 
-    Item * newCentroid = new Item("");
+    Item * newCentroid = new Item("null");
     int totalElements = static_cast<int>(Members.size());
     int dimensions = static_cast<int>(Members.begin()->second->getContent().size());
     vector<double>Points = vector<double>(dimensions,0); // set size to be the same with Item's content, init all with 0
 
     for(auto const& i : Members){ // for each element of Cluster
         Item * element_i = i.second;
-        for(unsigned int j=0; j< dimensions ; j++){ // for each point of the element
+        for(int j=0; j< dimensions ; j++){ // for each point of the element
             Points[j] += element_i->GetPoint(j);
         }
     }
@@ -144,7 +143,7 @@ bool Cluster::kmeans() {
 
     newCentroid->SetContent(Points);
 
-    for(int i=0;i<Centroid->getContent().size();i++){
+    for(unsigned int i=0;i<Centroid->getContent().size();i++){
         // check if the centroid remains the same (condition checks if 2 contents are  equal)
         if(Centroid->getContent()[i] != newCentroid->getContent()[i]){
             this->Centroid = newCentroid;

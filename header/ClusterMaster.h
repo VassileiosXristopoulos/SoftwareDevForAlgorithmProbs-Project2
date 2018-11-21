@@ -7,6 +7,7 @@
 
 // Lloyd's
 
+#include <fstream>
 #include "DataSetMap.h"
 #include "Cluster.h"
 #include "lsh/AHashTable.h"
@@ -28,6 +29,7 @@ private:
     Config_info config_info;
     string metric;
     string output_file;
+    ofstream outfile;
 
     void Initialization();
     void RandomSelection();
@@ -42,7 +44,7 @@ private:
     void PrintResults(double);
     vector<double> Silhouette();
 public:
-    ClusterMaster(Config_info, DataSetMap*, int[],string&,string&,bool);
+    ClusterMaster(Config_info, DataSetMap*, vector<int>,string&,string&,bool);
     ~ClusterMaster();
     void Clustering();
 

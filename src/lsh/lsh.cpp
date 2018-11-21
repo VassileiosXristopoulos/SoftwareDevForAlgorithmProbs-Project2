@@ -56,7 +56,7 @@ vector<Item*> lsh::FindItemsInRange(Item * centroid, double r) {
 }
 
 lsh::~lsh() {
-    for (int i = 0; i < rangeSearch_consts::L; i++) {
+    for (unsigned int i = 0; i < LshHashTables.size(); i++) {
         delete (LshHashTables[i]);
     }
 }

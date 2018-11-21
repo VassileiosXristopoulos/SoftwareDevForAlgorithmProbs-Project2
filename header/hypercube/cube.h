@@ -14,6 +14,7 @@ private:
     AHypercube *hypercube;
 public:
     cube(int k,int w,int probes,int M,string& metric,DataSetMap *set);
+    ~cube();
     vector<Item*> FindItemsInRange(Item *, double);
 };
 

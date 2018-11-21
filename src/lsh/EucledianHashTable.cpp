@@ -50,7 +50,7 @@ int EucledianHashTable::hash(Item *item) {
     for(unsigned  int i=0; i< r_vector.size() ; i++){
        sum += Util::my_mod(((int)r_vector[i])*(*h_i)[i],M);
     }
-
+    delete h_i;
     return Util::my_mod(sum,TableSize);
 }
 
@@ -60,6 +60,7 @@ vector< Item* > EucledianHashTable::findNcloserNeighbors(Item *item,double r){
     int bucket = hash(item);
     vector<int>*item_gVector=computeGVector(item);
     item->setGVector(*item_gVector);
+    delete item_gVector;
     vector< Item* >ret;
     for(unsigned int i=0; i<Table[bucket].size(); i++) {
         bool match = true;

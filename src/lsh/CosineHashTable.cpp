@@ -24,7 +24,9 @@ vector<int>* CosineHashTable::computeGVector(Item *item) {
 int CosineHashTable::hash(Item *item) {
     vector<int>* table = computeGVector(item);
     std::reverse(table->begin(),table->end());
-    return Util::my_mod(Util::intVectortoInteger(*table),TableSize);
+    int ret = Util::my_mod(Util::intVectortoInteger(*table),TableSize);
+    delete table;
+    return ret;
 }
 
 void CosineHashTable::add(Item *item) {

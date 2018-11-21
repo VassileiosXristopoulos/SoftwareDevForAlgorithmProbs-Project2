@@ -211,7 +211,7 @@ string Util::safe_getline(std::ifstream &config) {
     }
 }
 
-int* Util::GetUserChoise() {
+vector<int> Util::GetUserChoise() {
     int* Choises = new int[3];
     Choises[0] = 0;
     Choises[1] = 0;
@@ -259,7 +259,12 @@ int* Util::GetUserChoise() {
             exit(0);
         }
     }
-    return Choises;
+    vector<int>ret;
+    for(int i=0;i<3;i++){
+        ret.push_back(Choises[i]);
+    }
+    delete[] Choises;
+    return ret;
 }
 
 

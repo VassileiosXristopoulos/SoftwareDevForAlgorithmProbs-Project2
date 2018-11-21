@@ -31,8 +31,10 @@ int main(int argv, char*argc[]){
     string metric = argc[8];
     bool complete = false;
     if(argv==10){
-        if(*(new string(argc[9])) == "-complete")
+        string* comp = new string(argc[9]);
+        if(*(comp) == "-complete")
             complete=true;
+        delete(comp);
     }
 
     std::ifstream out(output_file);
@@ -43,8 +45,10 @@ int main(int argv, char*argc[]){
 
     Map->InsertFile(input_file);
     Config_info info = Util::GetConfiguration(config_file);
-    int* Choises = Util::GetUserChoise();
+    vector<int> Choises = Util::GetUserChoise();
     ClusterMaster* Clustermaster = new ClusterMaster(info, Map, Choises,metric,output_file,complete);
     Clustermaster->Clustering();
     cout<<"Program finished! Now you can go check the output at "<<output_file<<endl;
+    delete (Clustermaster);
+    delete (Map);
 }

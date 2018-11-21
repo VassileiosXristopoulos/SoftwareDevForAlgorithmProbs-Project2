@@ -6,7 +6,10 @@
 
 HashNode::HashNode(Item *item,vector<int>* gvector) {
     my_item=item;
-    gVector=*gvector;
+    for(unsigned int i=0;i<(*gvector).size();i++){
+        this->gVector.push_back((*gvector)[i]);
+    }
+    delete gvector;
 }
 
 HashNode::~HashNode() {
