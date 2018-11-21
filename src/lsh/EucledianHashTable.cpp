@@ -86,39 +86,7 @@ vector< Item* > EucledianHashTable::findNcloserNeighbors(Item *item,double r){
     return ret;
 }
 
-pair<Item*,double> EucledianHashTable::findCloserNeighbor(Item *item){
-    int bucket = hash(item);
-    vector<int>*item_gVector=computeGVector(item);
-    item->setGVector(*item_gVector);
-    vector< pair<Item*,double> >ret;
-    pair<Item*,double>min_pair(NULL,-1);
-    int retrieved=0;
-    for(unsigned int i=0; i<Table[bucket].size(); i++) {
-        bool match = true;
-        if(retrieved == 2*rangeSearch_consts::L) return min_pair;
-        for (unsigned int j = 0; j < item->getGVector().size(); j++) { //same logic with R nearest
-            if (item->getGVector()[j] != Table[bucket][i]->getGvector()[j]) {
-                match = false;
-                break;
-            }
-        }
-        if (match) {
-            Item *datasetItem = Table[bucket][i]->getItem();
 
-            double distance = Util::EucledianDistance(item->getContent(), Table[bucket][i]->getItem()
-                    ->getContent());
-            if (item->getName().compare(datasetItem->getName()) != 0) {
-                if (min_pair.second == -1 || min_pair.second > distance ) {
-                    min_pair.second = distance;
-                    min_pair.first = datasetItem;
-                    retrieved++;
-                }
-            }
-        }
-    }
-    return min_pair;
-
-}
 
 vector<int>* EucledianHashTable::computeGVector(Item* item){
     vector<int>* h_i= new vector<int>(rangeSearch_consts::k);

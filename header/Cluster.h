@@ -24,12 +24,9 @@ public:
     bool Contains(string item);
     void DeleteMember(string);
     void InsertMember(Item*);
-    bool ReplaceElements(vector<Item*>);
     map<string,Item*> GetMembers();
     bool Update(int);
     void FlushClusterMembers();
-    void ComputeSilhouette();
-    double GetSilhouette();
     int size();
 };
 

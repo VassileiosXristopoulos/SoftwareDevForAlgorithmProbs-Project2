@@ -20,7 +20,6 @@ public:
     int hash(Item*item) override;
     void add(Item* item) override;
     vector<Item*>  findNcloserNeighbors(Item *item,double r) override;
-    pair<Item *, double>  findCloserNeighbor(Item *item) override;
     int size() override;
 };
 

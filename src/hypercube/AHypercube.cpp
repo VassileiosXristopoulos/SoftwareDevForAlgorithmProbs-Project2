@@ -41,46 +41,7 @@ vector<CubeEdge *> AHypercube::getHamingCLose(int hammingDist, CubeEdge *edge) {
     return closeEdges;
 }
 
-pair<string, double> AHypercube::findCloser(Item *item, int max, int probes) { //getbitVector
-    vector<int>bitVector = getBitVector(item); //getBitvector returns the right vector
-    std::reverse(bitVector.begin(),bitVector.end());
-    CubeEdge * currentEdge = edges[Util::intVectortoInteger(bitVector)];
-    vector<Item*>elements = currentEdge->Elements();
-    pair<string,double>min_item("",-1);
-    int elems_checked = 0;
-    for(unsigned int i=0;i < elements.size() ;i++){
-        if(elems_checked++ > max) return min_item; //if reached the max elements, return
-        double dist = computeDistance(item->getContent(),elements[i]->getContent());
-        if(min_item.second<0 || min_item.second>dist){ //get minimum distance.
-            min_item.first = elements[i]->getName();
-            min_item.second = dist;
-        }
-    }
-    int hamminDist = 1, probes_checked = 0;
-    while(1){
-        if(probes_checked==probes) break; //if checked maximum number of probes defined by user, return
-        vector<CubeEdge*> hamingClose = getHamingCLose(hamminDist,currentEdge);
-        if(hamingClose.size()==0) return min_item; // no other edge available
 
-        for(unsigned int i=0 ; i<hamingClose.size(); i++){ //for each close edge
-
-            vector<Item*> items = hamingClose[i]->Elements();
-            for(unsigned int j=0 ; j<items.size() ; j++){ // for each element of close edge
-                if(elems_checked++ > max) return min_item;
-                double dist = computeDistance(item->getContent(),items[j]->getContent());
-                if(min_item.second<0 || min_item.second>dist){
-                    min_item.first = items[j]->getName();
-                    min_item.second = dist;
-                }
-            }
-
-            if(++probes_checked==probes) return min_item;
-        }
-
-        hamminDist++;
-    }
-    return min_item;
-}
 
 vector<Item*> AHypercube::findRCloser(Item *item, int max, int probes, double radius) {
     vector<int>bitVector = getBitVector(item); //getBitvector returns the right vector

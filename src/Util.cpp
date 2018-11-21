@@ -110,7 +110,7 @@ vector<string> Util::SplitCommas(string &line) {
 
 
 
-Config_info Util::GetConfiguration(string config_file) { //TODO: implement text before numbers and default cases
+Config_info Util::GetConfiguration(string config_file) {
     std::ifstream config(config_file);
     if(!config.good()){
         cout<< "Invalid Configuation file!"<<endl;
@@ -138,39 +138,27 @@ Config_info Util::GetConfiguration(string config_file) { //TODO: implement text 
     temp = safe_getline(config);
     wordVector = SplitBlanks(temp);
     if(wordVector.size()==2 && !wordVector[1].empty()) {
-        info.numof_hashFunctions = safe_atoi(wordVector[1]);
+        info.lsh_k = safe_atoi(wordVector[1]);
     }
     else if(wordVector.size() == 1 || wordVector[1].empty()){ // if 1 word in line, take default num of hashfunctions
-        info.numof_hashFunctions = 4;
+        info.lsh_k = 4;
     }
     else{
         cout << "Unknown error when reading configuration file"<<endl;
         exit(0);
-    }
-
-    temp = safe_getline(config);
-    wordVector = SplitBlanks(temp);
-    if(wordVector.size() == 2 && !wordVector[1].empty()) {
-        info.numOf_hashTables = safe_atoi(wordVector[1]);
-    }
-    else if(wordVector.size() == 1 || wordVector[1].empty()) { // if 1 word in line, take default num of hash tables
-        info.numOf_hashTables = 5;
-    }
-    else{
-        cout << "Unknown error when reading configuration file"<<endl;
-        exit(0);
-    }
-
-    temp = safe_getline(config);
-    wordVector = SplitBlanks(temp);
-    if(wordVector.size() == 2 && !wordVector[1].empty()) {
-        info.lsh_k = safe_atoi(wordVector[1]);
     }
 
     temp = safe_getline(config);
     wordVector = SplitBlanks(temp);
     if(wordVector.size() == 2 && !wordVector[1].empty()) {
         info.lsh_L = safe_atoi(wordVector[1]);
+    }
+    else if(wordVector.size() == 1 || wordVector[1].empty()) { // if 1 word in line, take default num of hash tables
+        info.lsh_L = 5;
+    }
+    else{
+        cout << "Unknown error when reading configuration file"<<endl;
+        exit(0);
     }
 
     temp = safe_getline(config);

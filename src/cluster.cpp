@@ -34,10 +34,17 @@ int main(int argv, char*argc[]){
         if(*(new string(argc[9])) == "-complete")
             complete=true;
     }
-                                                            // TODO: implement printing
-    Map->InsertFile(input_file);                            // TODO: implement Shilouette
-    Config_info info = Util::GetConfiguration(config_file); // TODO: implement giving all lsh/cube args from config
+
+    std::ifstream out(output_file);
+    if(!out.good()){
+        cout<< "Invalid Output file!"<<endl;
+        exit(0);
+    }
+
+    Map->InsertFile(input_file);
+    Config_info info = Util::GetConfiguration(config_file);
     int* Choises = Util::GetUserChoise();
-    ClusterMaster* Clustermaster = new ClusterMaster(info, Map, Choises,metric,complete);
+    ClusterMaster* Clustermaster = new ClusterMaster(info, Map, Choises,metric,output_file,complete);
     Clustermaster->Clustering();
+    cout<<"Program finished! Now you can go check the output at "<<output_file<<endl;
 }

@@ -22,7 +22,6 @@ public:
     vector<CubeEdge*> getHamingCLose(int hammingDist,CubeEdge* edge);
     void add(Item* item);
     virtual double computeDistance(vector<double>&x,vector<double>&y) = 0;
-    pair<string,double> findCloser(Item *item,int max,int probes);
     vector<Item*> findRCloser(Item *item,int max,int probes,double radius);
     virtual int size() = 0;
 };

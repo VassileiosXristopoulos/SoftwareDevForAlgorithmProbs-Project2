@@ -54,28 +54,6 @@ vector<Item*>  CosineHashTable::findNcloserNeighbors(Item *item,double r) {
     return ret;
 }
 
-pair<Item *, double> CosineHashTable::findCloserNeighbor(Item *item) {
-    int bucket = hash(item);
-
-    vector< pair<Item*,double> >ret;
-    pair<Item*,double>min_pair(NULL,-1);
-    int retrieved=0;
-    for(unsigned int i=0; i<Table[bucket].size(); i++) { //same logic with find R-nearest
-
-       Item *datasetItem = Table[bucket][i]->getItem();
-       double distance = Util::cosineDistance(item->getContent(), datasetItem->getContent());
-
-       if (item->getName().compare(datasetItem->getName()) != 0) {
-           if (min_pair.second == -1 || min_pair.second > distance ) {
-               min_pair.second = distance;
-               min_pair.first = datasetItem;
-               retrieved++;
-            }
-        }
-    }
-    return min_pair;
-
-}
 
 CosineHashTable::~CosineHashTable()  {
     for(unsigned int i=0;i<Table.size();i++){

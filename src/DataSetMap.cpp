@@ -86,7 +86,7 @@ DataSetMap::DataSetMap(DataSetMap & Map) {
 }
 
 void DataSetMap::erase(Item *item) {
-    int pos = (int)(find(Map.begin(), Map.end(), item) - Map.begin());
+    unsigned int pos = (unsigned int)(find(Map.begin(), Map.end(), item) - Map.begin());
     if(pos<Map.size()){
         Map.erase(Map.begin()+pos);
     }

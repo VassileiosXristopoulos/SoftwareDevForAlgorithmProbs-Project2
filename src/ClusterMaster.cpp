@@ -8,6 +8,7 @@
 #include "../header/Util.h"
 #include <ctime>
 #include <random>
+#include <fstream>
 
 default_random_engine generator;
 normal_distribution<float> distribution(0,1);
@@ -15,11 +16,13 @@ normal_distribution<float> distribution(0,1);
 /**
  * Constructor
  */
-ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric,bool complete) {
+ClusterMaster::ClusterMaster(Config_info config_info, DataSetMap* set, int* V,string& metric,string& output_file,bool
+complete) {
 
     this->complete = complete; // for complete printing
     this->config_info = config_info;
     this->metric = metric;
+    this->output_file = output_file;
 
     this->Clusters = vector<Cluster*>((unsigned long)config_info.k);
     for(int i=0;i<config_info.k;i++){
@@ -104,16 +107,28 @@ void ClusterMaster::RandomSelection() {
  * K-Means++
  */
 void ClusterMaster::kmeanspp() {
+    if((int)Clusters.size()>Dataset->size()){
+        cout<<"Cannot Perform K-Means++. Number of Clusters bigger than dataset."<<endl;
+        exit(0);
+    }
     int initialCentroid = rand() % Dataset->size();
     Clusters[0]->SetCentroid(Dataset->at(initialCentroid)); // pick uniformly first centroid
     Dataset->at(initialCentroid)->SetCluster(0);
-    DataSetMap* nonCentroidMap = new DataSetMap(*Dataset); // get copy of Dataset, keep only the non centroids
+    DataSetMap * nonCentroidMap = new DataSetMap();
+    for(int i=0;i<Dataset->size(); i++){
+        nonCentroidMap->append(Dataset->at(i));
+    } // get copy of Dataset, keep only the non centroids
     nonCentroidMap->erase(Dataset->at(initialCentroid)); //erase from map, keep only the non centroids
+
+    if(nonCentroidMap->size()==0){
+        cout <<"No Dataset given!!" << endl;
+        exit(0);
+    }
 
     double maxDi = 0;
     vector<double>Di; // minimum distance from centroids
     // the idea is that we compute every D(i) once and for all and when we set a centroid we erase the element
-    for(unsigned int i=0;i<nonCentroidMap->size();i++){ // for each non centroid (compute minimum distace)
+    for( int i=0;i<nonCentroidMap->size();i++){ // for each non centroid (compute minimum distace)
 
         //initially, it is the distance from the "first" centroid
         double minDist = Util::EucledianDistance(nonCentroidMap->at(i)->getContent(),Clusters[0]->GetCentroid()
@@ -140,22 +155,26 @@ void ClusterMaster::kmeanspp() {
     }
 
     // perform the choosing of centroids
-    for(int i=1;i<Clusters.size(); i++){ // until all the clusters have centroids
+    for(unsigned int i=1;i<Clusters.size(); i++){ // until all the clusters have centroids
         vector<double>P((unsigned long)(nonCentroidMap->size() + 1),0); // P[0] = 0
 
-        for(int j = 1; j < P.size(); j++){ // fill P(r)
-            for(int k = 0; k < j ; k++){ // sum of D(i) from start until r
+        for(unsigned int j = 1; j < P.size(); j++){ // fill P(r)
+            for(unsigned int k = 0; k < j ; k++){ // sum of D(i) from start until r
                 P[j] += Di[k];
             }
         }
         // now we have P(r) array
         float rand_x = (float) (rand()) / ((float) (RAND_MAX / P[P.size()-1]) ); // pick random x ~ [0,P(n-t)]
         int newCentroid = -1;
+
         for(unsigned int j=1;j<P.size(); j++){
+
             if(rand_x > P[j-1] && rand_x <= P[j]){
                 newCentroid = j-1; // get the position (in Di or in nonCentroidMap) of the new selected centroid
             }
         }
+        if(rand_x == 0)
+            newCentroid = 0;
 
         if(newCentroid == -1){
             cout << "Error occured while performing kmeans++" <<endl;
@@ -177,7 +196,6 @@ void ClusterMaster::kmeanspp() {
  * Lloyd's assignement
  */
 void ClusterMaster::LloydsAssignment() {
-    bool noChanges = true;
     for(int i=0; i<Dataset->size(); i++){ // for each item
 
         Item * dataSetItem = Dataset->at(i);
@@ -190,7 +208,7 @@ void ClusterMaster::LloydsAssignment() {
 
         /* find minimum distance */
 
-        for(int j = 1; j<Clusters.size(); j++ ){
+        for(unsigned int j = 1; j<Clusters.size(); j++ ){
             double dist = Util::EucledianDistance(dataSetItem->getContent(),Clusters[j]->GetCentroid()->getContent
             ());
             if(dist<min){
@@ -250,12 +268,14 @@ void ClusterMaster::Assignement() {
  */
 void ClusterMaster::Clustering() {
     do{
+        clock_t begin = clock();
         this->Initialization();
         while( notFinished ){
             this->Assignement();
             this->Update();
         }
-        PrintResults();
+        clock_t end = clock();
+        PrintResults(double(end - begin) / CLOCKS_PER_SEC);
         SetNextChoise();
         ResetDataset();
         notFinished = true;
@@ -348,9 +368,9 @@ void ClusterMaster::SetNextChoise() {
  * Reset all clusters
  */
 void ClusterMaster::ResetDataset() {
-    for(int i=0;i<Clusters.size();i++){
-        delete (Clusters[i]);
-        Clusters[i] = new Cluster(); //remake all Clusters
+    for (auto &i : Clusters) {
+        delete i;
+        i = new Cluster(); //remake all Clusters
     }
     for(int i=0 ; i< Dataset->size();i++){
         Dataset->at(i)->SetCluster(-1); // set -1 to "belongs to cluster" field of each item
@@ -368,9 +388,9 @@ void ClusterMaster::RangeSearchAssignment(string& method) {
         nonAssignedItems->append(Dataset->at(i));
     }
 
-    for(int i=0;i<Clusters.size();i++){ // clear all Clusters (except the centroid obviously)
-        Clusters[i]->FlushClusterMembers(); //in this algorithm we compute all members from 0
-        nonAssignedItems->erase(Clusters[i]->GetCentroid());
+    for (auto &Cluster : Clusters) { // clear all Clusters (except the centroid obviously)
+        Cluster->FlushClusterMembers(); //in this algorithm we compute all members from 0
+        nonAssignedItems->erase(Cluster->GetCentroid());
     }
     /*----------------------ATTENTION: Until Loops are finished no item is inserted to cluster.  --------------------*/
     /*----------------------Reason is we would have to insert and delete from list.  --------------------*/
@@ -381,10 +401,10 @@ void ClusterMaster::RangeSearchAssignment(string& method) {
         items_returned = 0;
 
 
-        for(int i=0;i<Clusters.size();i++){ // for each cluster
+        for(unsigned int i=0;i<Clusters.size();i++){ // for each cluster
             vector<Item*>Ncloser = GenericFindinRange(method,Clusters[i]->GetCentroid(),r); // get items in range
             items_returned += Ncloser.size();
-            for( int j=0;j<Ncloser.size(); j++){ // for each item in range
+            for(unsigned int j=0;j<Ncloser.size(); j++){ // for each item in range
                 if( Ncloser[j]->GetCluster() == -1){  // if items dont belong to some cluster
                     Ncloser[j]->SetCluster(i);
                     nonAssignedItems->erase(Ncloser[j]); // keep only the non assigned items
@@ -413,7 +433,7 @@ void ClusterMaster::RangeSearchAssignment(string& method) {
             // minimum distance from cluster
             double min_dist = Util::EucledianDistance(Dataset->at(i)->getContent(),Clusters[0]->GetCentroid()
             ->getContent());
-            for(int j=1;j<Clusters.size();j++){ // find the closest cluster
+            for(unsigned int j=1;j<Clusters.size();j++){ // find the closest cluster
                 double dist = Util::EucledianDistance(Dataset->at(i)->getContent(),Clusters[j]->GetCentroid()
                         ->getContent());
                 if(dist<min_dist){
@@ -432,43 +452,47 @@ void ClusterMaster::RangeSearchAssignment(string& method) {
 
 }
 
-void ClusterMaster::PrintResults() {
-    cout <<"Algorithm " << Choises[0] <<"."<<Choises[1]<<"."<<Choises[2]<<endl<<endl;
-    for(int i=0; i<Clusters.size();i++){
-        cout <<"CLUSTER-"<<i+1<<" { size:"<<Clusters[i]->size() <<" Centroid: ";
+void ClusterMaster::PrintResults(double elapsed_time) {
+    ofstream outfile;
+    outfile.open(output_file);
+    outfile <<"Algorithm " << Choises[0] <<"."<<Choises[1]<<"."<<Choises[2]<<endl<<endl;
+    for(unsigned int i=0; i<Clusters.size();i++){
+        outfile <<"CLUSTER-"<<i+1<<" { size:"<<Clusters[i]->size() <<" Centroid: ";
         if(Choises[2] == 1){ //kmeans-update
-            cout << "[ ";
-            for(int j=0;j<Clusters[i]->GetCentroid()->getContent().size();j++){
-                cout<<Clusters[i]->GetCentroid()->getContent()[j]<<" ";
+            outfile << "[ ";
+            for (double j : Clusters[i]->GetCentroid()->getContent()) {
+                outfile<< j <<" ";
             }
-            cout<<"] }"<<endl;
+            outfile<<"] }"<<endl;
         }
         else if(Choises[2] == 2){ //k-medoids update
-           cout <<Clusters[i]->GetCentroid()->getName() <<" }"<<endl;
+           outfile <<Clusters[i]->GetCentroid()->getName() <<" }"<<endl;
         }
     }
-    cout<<endl;
-  /*  vector<double>silhouette = Silhouette();
-    cout<< "Silhouette :[";
+    outfile<<endl;
+    outfile<<"Clustering time: "<<elapsed_time<<endl;
+    vector<double>silhouette = Silhouette();
+    outfile<< "Silhouette :[";
     if(silhouette.size()>0){
-        cout << silhouette[0];
+        outfile << silhouette[0];
         for(int j=1;j<silhouette.size();j++){
-            cout << ","<<silhouette[j];
+            outfile << ","<<silhouette[j];
         }
     }
-    cout<<"]"<<endl;*/
+    outfile<<"]"<<endl;
 
     if(complete){ //complete printing
-        cout << "/*------------------- Items in each cluster -----------------*/"<<endl;
-        for(int i=0; i<Clusters.size();i++) {
-            cout << "CLUSTER-" << i + 1 <<" { ";
+        outfile << "/*------------------- Items in each cluster -----------------*/"<<endl;
+        for(unsigned int i=0; i<Clusters.size();i++) {
+            outfile << "CLUSTER-" << i + 1 <<" { ";
             for(auto const& j: Clusters[i]->GetMembers()){
-                cout << j.first <<" ";
+                outfile << j.first <<" ";
             }
-            cout<<" }"<<endl;
+            outfile<<" }"<<endl;
         }
     }
-    cout<<endl<<endl<<endl;
+    outfile<<endl<<endl<<endl;
+    outfile.close();
 }
 
 vector<Item *> ClusterMaster::GenericFindinRange(string &method, Item * centroid, double r) {
@@ -478,17 +502,16 @@ vector<Item *> ClusterMaster::GenericFindinRange(string &method, Item * centroid
     else if(method == "hypercube"){
         return hypercube_master->FindItemsInRange(centroid,r);
     }
+    return vector<Item*>();
 }
 
 vector<double> ClusterMaster::Silhouette() {
     vector<double>SilhouetteVector;
     double stotal = 0;
-    for(int i=0;i<Clusters.size();i++){ // for each cluster
+    for(unsigned int i=0;i<Clusters.size();i++){ // for each cluster
         double s_i = 0;
         Cluster *Cluster_i = Clusters[i];
-        if(Clusters[i]->size()==1){
-            cout <<"this going to give nan"<<endl;
-        }
+
         for(auto const& x_i: Cluster_i->GetMembers()){
             /*---- compute a(i) for an element of Cluster i -----*/
 
@@ -506,7 +529,7 @@ vector<double> ClusterMaster::Silhouette() {
             /*------------ find the neighboor cluster -----------*/
             double min_dist = -1;
             int neighboor = -1;
-            for(int j = 0;j<Clusters.size(); j++){ // iterate all the Clusters to find the closest
+            for(unsigned int j = 0;j<Clusters.size(); j++){ // iterate all the Clusters to find the closest
                 if( i != j){ // if not the same cluster
                     if(min_dist == -1){ // if we haven't computed another distance
                         min_dist = Util::EucledianDistance(Cluster_i->GetCentroid()->getContent(),
@@ -533,13 +556,20 @@ vector<double> ClusterMaster::Silhouette() {
                 for(auto const & x_j : Clusters[neighboor]->GetMembers()){
                     b_i += Util::EucledianDistance(x_i.second->getContent(),x_j.second->getContent());
                 }
-                b_i /= Clusters[neighboor]->GetMembers().size();
+                if(Clusters[neighboor]->GetMembers().size() > 0)
+                    b_i /= Clusters[neighboor]->GetMembers().size();
             }
-            if(Clusters[neighboor]->size() > 0)
-                b_i /= Clusters[neighboor]->size();
+
             /*--------------------------------------------------*/
-            if(a_i >0 || b_i>=0)
-                s_i += (b_i-a_i)/max(a_i,b_i);
+            if(a_i >0 || b_i>=0){
+                double max;
+                if(a_i>b_i)
+                    max = a_i;
+                else
+                    max = b_i;
+                s_i += (b_i-a_i)/max;
+            }
+
 
         }
         if(Clusters[i]->GetMembers().size()-1 > 0)
@@ -549,7 +579,7 @@ vector<double> ClusterMaster::Silhouette() {
         SilhouetteVector.push_back( s_i ); // push it to the vector
         stotal += s_i; // add it to the sum that will become the stotal
     }
-    if(Clusters.size()>0)
+    if(!Clusters.empty())
         stotal /= Clusters.size();
     SilhouetteVector.push_back(stotal);
     return SilhouetteVector;

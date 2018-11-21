@@ -54,14 +54,6 @@ void Cluster::InsertMember(Item * item) {
 
 
 
-/**
- * Range Search
- */
-bool Cluster::ReplaceElements(vector<Item *>) {
-    return false;
-}
-
-
 
 /**
  * Update Members
@@ -76,7 +68,7 @@ bool Cluster::Update(int algorithm) {
             ret = PAM();
             break;
         default:
-            cout<< "Error: No Update can be performed" <<endl; // TODO: implement function for errors at Util
+            cout<< "Error: No Update can be performed" <<endl;
             exit(0);
     }
     return ret;
@@ -112,26 +104,18 @@ bool Cluster::PAM() {
             newCentroid = element_i;
             min_sum = sum;
         }
-
-//        distances.push_back(make_pair(sum,i.first));
     }
-    return newCentroid->getName() == GetCentroid()->getName();
 
-    /* double min = distances[0].first;
-    string newCentroid = Members.begin()->first;
-    for(int j=1; j<distances.size(); j++){
-        if(distances[j].first<min){
-            min = distances[j].first;
-            newCentroid = distances[j].second;
+    for(int i=0;i<Centroid->getContent().size();i++){
+        // check if the centroid remains the same (condition checks if 2 contents are  equal)
+        if(Centroid->getContent()[i] != newCentroid->getContent()[i]){
+            this->Centroid = newCentroid;
+            return false;
         }
     }
-    Item * NewCentroid = Members.find(newCentroid)->second;
 
-    if(NewCentroid->getName() == Centroid->getName()){ // if the centroid did not change
-        return true;
-    }
-    Centroid = NewCentroid;
-    return false;*/
+    return true;
+
 }
 
 
@@ -160,24 +144,15 @@ bool Cluster::kmeans() {
 
     newCentroid->SetContent(Points);
 
-   /* if (std::equal(Centroid->getContent().begin(), Centroid->getContent().begin() + Centroid->getContent().size(),
-            newCentroid->getContent()
-    .begin())){ // if the centroid remains the same (condition checks if 2 contents are equal)
-        return true;
-    }*/
-    bool same = true;
     for(int i=0;i<Centroid->getContent().size();i++){
         // check if the centroid remains the same (condition checks if 2 contents are  equal)
         if(Centroid->getContent()[i] != newCentroid->getContent()[i]){
-            same = false;
-            break;
+            this->Centroid = newCentroid;
+            return false;
         }
     }
-    if(same)
-        return true;
 
-    this->Centroid = newCentroid;
-    return false;
+    return true;
 }
 
 void Cluster::FlushClusterMembers() {
@@ -188,24 +163,6 @@ void Cluster::FlushClusterMembers() {
 
 map<string,Item*> Cluster::GetMembers() {
     return this->Members;
-}
-
-void Cluster::ComputeSilhouette() {
-    for(auto const & i : Members){ // for each member i
-        double a_i = 0;
-        for(auto const & x : Members){
-            if(i.first != x.first){ // if not the same Member, different name
-                a_i += Util::EucledianDistance(i.second->getContent(),x.second->getContent());
-            }
-        }
-        a_i /= (Members.size() -1);
-
-
-    }
-}
-
-double Cluster::GetSilhouette() {
-    return 0;
 }
 
 

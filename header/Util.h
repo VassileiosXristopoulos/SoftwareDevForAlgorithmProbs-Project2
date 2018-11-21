@@ -7,28 +7,9 @@
 
 
 #include "Item.h"
-struct Lsh_arguments{ //TODO:  remove structs for project 1
-    string inputFile;
-    string queryFile;
-    int k;
-    int L;
-    string outputFIle;
-};
-
-struct Cube_arguments{
-    string inputFile;
-    string queryFile;
-    int probes;
-    int k;
-    int M;
-    string outputFIle;
-
-};
 
 struct Config_info{
     int k;
-    int numof_hashFunctions;
-    int numOf_hashTables;
     int lsh_k;
     int lsh_L;
     int w;
@@ -56,8 +37,6 @@ public:
     static double cosineDistance(vector<double>&x,vector<double>&y);
     static vector<string> SplitBlanks(string &line);
     static vector<string> SplitCommas(string &line);
-    static Lsh_arguments getLshArguments(int argv,char *argc[]);
-    static Cube_arguments getCubeArguments(int argv,char *argc[]);
     static Config_info GetConfiguration(string);
     static int safe_atoi(string);
     static string safe_getline(std::ifstream&);
